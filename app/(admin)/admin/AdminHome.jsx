@@ -181,11 +181,11 @@ const styles = StyleSheet.create({
         paddingBottom: 20
     },
     requestsContainer: {
-        height: '40%',
+        height: '20%',
         marginBottom: 10
     },
     requestsActualContainer: {
-        height: '40%',
+        height: '70%',
         marginTop: 10
     },
     blockItem: {
