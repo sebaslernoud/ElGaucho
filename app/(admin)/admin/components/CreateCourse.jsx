@@ -1,194 +1,361 @@
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-const { width, height } = Dimensions.get('window');
+import { useState, useEffect } from 'react';
+import { Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { useSelector } from 'react-redux';
+import DateTimePicker from '@react-native-community/datetimepicker'; // Importar el calendario
+import { createCourse } from '../../../src/services/courseService';
 
-function Section () {
-  const navigation = useRouter();
-  return(
-      <View style={styles.boxMembers}>
-          <TouchableOpacity style = {styles.memberButton}>
-              <Image style={styles.memberImage} source={{uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAChklEQVR4nO2ZTYiNURjHfwxmyGCBzIJ8jFJiw4Zu2SBcFqyEhSIfGxGNFYmJWEmp2SkfxVgJKZJMo2ZEUxLJQiNfYchsyMc908lfvd3c+973Pe91jnp/9azuOf/+zz1fzzkv5OT8VzQABWAf0AF0AheBk8B6YAyB0wi0AW8BUyXeAUUCZQbwOGL2IXBKo7JBI7Ef6Nbv34EzwDICYhLQL4M9wIKY9gfLRugqMI4AuCRDdzS94hgGTAe2Aa/V9xqemQmUgK9Aa4r+04ABJbMCj+ySifMOGocy0HDmikxsdNCYL40neKRXJuIWeDVGAT+BHzqDvPBciaRZH1HsdmyUlBeeysAsBw07Cr8U3kakS4ksctCYKo03eKRTJtY5aCyVxl08ckAmDjtotEujHY8UZeKGg8Y9aSzHI2tlYkClR1ImRnasAh7pkYmdKfuPAI5I4wIe6c/gHFksjS48cl0mNjlo7JDGWTyyXSZeAHtSFowvM6jXnBkZKRyTFn12c/isa8Bln6f6H4YDgyr8mhP0a9Uf8IyAuJlirbSpj727B8NWmXpQ43nSqHVl+6wiIEZHFu3xGtqfU9s+Tc2gWJ2gijUZXMjqRkuKRIKkJU8kMIoakW96fazElMjUWkhgrAQ+RgzaHWw3MBcYqyfReX955H4FLCEACnq7LcW8wFcL2/cWsCblncbpzNgCPHIwXyn6gM1AUz0TmAwcBT7UIYHyeK87vL1BZkaD5vbgP0jAlMUXYG8Wp/8EfS4wnuM2MD5tEs0qAk0gcV87YGI6AjBvyuJ00iTmOG6p9YoSMDtJIicCMG0qxLE071UhRneSRD4FYNhUCPuqWRNNAZg1MVHL1+OcnBx+MwTQ0ifIg+pOMwAAAABJRU5ErkJggg=="}} />
-              <Text style={styles.memberText}>Nombre cualquiera</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style = {styles.memberButton} title="Ir a Curso"
-            onPress={() => navigation.navigate('Agregar')}>
-              <Image style={styles.memberImage} source={{uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAChklEQVR4nO2ZTYiNURjHfwxmyGCBzIJ8jFJiw4Zu2SBcFqyEhSIfGxGNFYmJWEmp2SkfxVgJKZJMo2ZEUxLJQiNfYchsyMc908lfvd3c+973Pe91jnp/9azuOf/+zz1fzzkv5OT8VzQABWAf0AF0AheBk8B6YAyB0wi0AW8BUyXeAUUCZQbwOGL2IXBKo7JBI7Ef6Nbv34EzwDICYhLQL4M9wIKY9gfLRugqMI4AuCRDdzS94hgGTAe2Aa/V9xqemQmUgK9Aa4r+04ABJbMCj+ySifMOGocy0HDmikxsdNCYL40neKRXJuIWeDVGAT+BHzqDvPBciaRZH1HsdmyUlBeeysAsBw07Cr8U3kakS4ksctCYKo03eKRTJtY5aCyVxl08ckAmDjtotEujHY8UZeKGg8Y9aSzHI2tlYkClR1ImRnasAh7pkYmdKfuPAI5I4wIe6c/gHFksjS48cl0mNjlo7JDGWTyyXSZeAHtSFowvM6jXnBkZKRyTFn12c/isa8Bln6f6H4YDgyr8mhP0a9Uf8IyAuJlirbSpj727B8NWmXpQ43nSqHVl+6wiIEZHFu3xGtqfU9s+Tc2gWJ2gijUZXMjqRkuKRIKkJU8kMIoakW96fazElMjUWkhgrAQ+RgzaHWw3MBcYqyfReX955H4FLCEACnq7LcW8wFcL2/cWsCblncbpzNgCPHIwXyn6gM1AUz0TmAwcBT7UIYHyeK87vL1BZkaD5vbgP0jAlMUXYG8Wp/8EfS4wnuM2MD5tEs0qAk0gcV87YGI6AjBvyuJ00iTmOG6p9YoSMDtJIicCMG0qxLE071UhRneSRD4FYNhUCPuqWRNNAZg1MVHL1+OcnBx+MwTQ0ifIg+pOMwAAAABJRU5ErkJggg=="}} />
-              <Text style={styles.memberText}>Agregar</Text>
-          </TouchableOpacity>
-      </View>
-  );
-};
+const { width } = Dimensions.get('window');
 
-const CreateCourse = (props) =>{ 
+const CreateCourse = () => { 
   const router = useRouter();
+  
+  // Obtener token de Redux
+  const authState = useSelector(state => state.auth);
+  const token = authState?.token;
 
-  const [selectedCourseValue, setselectedCourseValue] = useState('default'); // Set an initial value
-    
-  const handleCourseChange = (itemValue, itemIndex) => {
-      setselectedCourseValue(itemValue);
+  // Estados del formulario
+  const [courseType, setCourseType] = useState('RELUL'); // Estado para el TIPO, no el título final
+  const [description, setDescription] = useState('');
+  
+  // Estados para Fechas (Objetos Date)
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  
+  // Estados para mostrar/ocultar calendarios
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+
+  const [location, setLocation] = useState('');
+  const [maxParticipants, setMaxParticipants] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState('');
+
+  // Efecto para actualizar el Título Automático cuando cambia el Tipo o la Fecha de Inicio
+  useEffect(() => {
+    if (startDate) {
+        const monthNames = [
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ];
+        const month = monthNames[startDate.getMonth()];
+        const year = startDate.getFullYear();
+        setPreviewTitle(`${courseType} ${month} ${year}`);
+    }
+  }, [courseType, startDate]);
+
+  // Manejador de cambio de fecha
+  const onDateChange = (event, selectedDate, type) => {
+    if (type === 'start') {
+        setShowStartPicker(Platform.OS === 'ios'); // En iOS se mantiene, en Android se cierra
+        if (selectedDate) setStartDate(selectedDate);
+    } else {
+        setShowEndPicker(Platform.OS === 'ios');
+        if (selectedDate) setEndDate(selectedDate);
+    }
   };
 
-  const options = ['RELUL', 'RELAL'];
+  const handleCreate = async () => {
+    if (!token) {
+        Alert.alert("Error", "No estás autenticado.");
+        return;
+    }
+
+    if (!location) {
+        Alert.alert("Campos incompletos", "Por favor completa la ubicación.");
+        return;
+    }
+
+    // Validación básica: Fecha fin no puede ser antes de fecha inicio
+    if (endDate < startDate) {
+        Alert.alert("Error en fechas", "La fecha de fin no puede ser anterior a la de inicio.");
+        return;
+    }
+
+    setLoading(true);
+
+    try {
+        const courseData = {
+            title: previewTitle, // Usamos el título generado automáticamente
+            description,
+            startDate: startDate.toISOString(), // Enviamos formato ISO completo
+            endDate: endDate.toISOString(),
+            location,
+            maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
+            status: 'upcoming'
+        };
+
+        await createCourse(courseData, token);
+        
+        Alert.alert("Éxito", `Curso "${previewTitle}" creado correctamente`, [
+            { text: "OK", onPress: () => router.back() }
+        ]);
+
+    } catch (error) {
+        console.error("Error creando curso:", error);
+        Alert.alert("Error", "Hubo un problema al crear el curso. Revisa tu conexión.");
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  // Helper para mostrar fecha legible en el botón
+  const formatDateForDisplay = (date) => {
+    return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
+
   return(
-    <View style={styles.bigContainer}>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.bigContainer}
+    >
       <View style= {styles.titleContainer}>
         <Text style= {styles.title}>Crear un curso</Text>
       </View>
-      <View  style= {styles.createContainer}>
-        <View style = {styles.optionContainer}>
-          <Text style = {styles.optionTitle}>Elija un curso</Text>
-          <View style = {styles.containerSelecOptionCourse}>
-            <Picker style={styles.selectableOptionsCourse} mode="dropdown" selectedValue={selectedCourseValue} onValueChange={handleCourseChange}>
-              <Picker.Item label="RELUL" value="java" />  
-              <Picker.Item label="RELAL" value="js" />
-            </Picker>
-          </View>
-        </View>
-        <View style = {styles.dateContainer}>
-          <Text style = {styles.dateTitle}>Ingrese fecha</Text>
-          <View style = {styles.containerSelecDateCourse}>
-            <TextInput style={styles.input} placeholder='formato: 08-03-2024' ></TextInput>
-          </View>
-        </View>
-          
-            <TouchableOpacity style={styles.createButtom} title="Ir a menu"
-            onPress={() => navigation.navigate('Curso admin')}>
-              <Text style={styles.createButtomText}>Crear</Text>
-            </TouchableOpacity>
+      
+      <View style= {styles.createContainer}>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            
+            {/* Tipo de Curso */}
+            <View style = {styles.inputGroup}>
+              <Text style = {styles.label}>Tipo de Curso</Text>
+              <View style = {styles.pickerContainer}>
+                <Picker 
+                    style={styles.picker} 
+                    selectedValue={courseType} 
+                    onValueChange={(itemValue) => setCourseType(itemValue)}
+                >
+                  <Picker.Item label="RELUL" value="RELUL" />  
+                  <Picker.Item label="RELAL" value="RELAL" />
+                </Picker>
+              </View>
+            </View>
+
+            {/* Vista Previa del Título */}
+            <View style={styles.previewContainer}>
+                <Text style={styles.previewLabel}>Nombre del curso será:</Text>
+                <Text style={styles.previewText}>{previewTitle}</Text>
+            </View>
+
+            {/* Fechas con Calendario */}
+            <View style={styles.row}>
+                {/* Fecha Inicio */}
+                <View style = {[styles.inputGroup, styles.halfInput]}>
+                    <Text style = {styles.label}>Fecha Inicio</Text>
+                    <TouchableOpacity 
+                        style={styles.dateButton} 
+                        onPress={() => setShowStartPicker(true)}
+                    >
+                        <Text style={styles.dateText}>{formatDateForDisplay(startDate)}</Text>
+                    </TouchableOpacity>
+                    
+                    {showStartPicker && (
+                        <DateTimePicker
+                            value={startDate}
+                            mode="date"
+                            display="default"
+                            onChange={(e, d) => onDateChange(e, d, 'start')}
+                        />
+                    )}
+                </View>
+
+                {/* Fecha Fin */}
+                <View style = {[styles.inputGroup, styles.halfInput]}>
+                    <Text style = {styles.label}>Fecha Fin</Text>
+                    <TouchableOpacity 
+                        style={styles.dateButton} 
+                        onPress={() => setShowEndPicker(true)}
+                    >
+                        <Text style={styles.dateText}>{formatDateForDisplay(endDate)}</Text>
+                    </TouchableOpacity>
+
+                    {showEndPicker && (
+                        <DateTimePicker
+                            value={endDate}
+                            mode="date"
+                            display="default"
+                            minimumDate={startDate} // No permite seleccionar antes del inicio
+                            onChange={(e, d) => onDateChange(e, d, 'end')}
+                        />
+                    )}
+                </View>
+            </View>
+
+            {/* Ubicación */}
+            <View style = {styles.inputGroup}>
+              <Text style = {styles.label}>Ubicación</Text>
+              <TextInput 
+                style={styles.input} 
+                placeholder='Ej: Buenos Aires, Argentina' 
+                value={location}
+                onChangeText={setLocation}
+              />
+            </View>
+
+            {/* Máx Participantes */}
+            <View style = {styles.inputGroup}>
+              <Text style = {styles.label}>Máx. Participantes</Text>
+              <TextInput 
+                style={styles.input} 
+                placeholder='Ej: 100' 
+                value={maxParticipants}
+                onChangeText={setMaxParticipants}
+                keyboardType="numeric"
+              />
+            </View>
+
+            {/* Descripción */}
+            <View style = {styles.inputGroup}>
+              <Text style = {styles.label}>Descripción</Text>
+              <TextInput 
+                style={[styles.input, styles.textArea]} 
+                placeholder='Ej: Curso de liderazgo para universitarios...' 
+                multiline={true}
+                numberOfLines={3}
+                value={description}
+                onChangeText={setDescription}
+              />
+            </View>
+            
+            {loading ? (
+                <ActivityIndicator size="large" color="lightblue" style={{marginTop: 20}} />
+            ) : (
+                <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
+                    <Text style={styles.createButtonText}>Crear Curso</Text>
+                </TouchableOpacity>
+            )}
+
+        </ScrollView>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
-
 const styles = StyleSheet.create({
+  bigContainer: {
+    flex: 1,
+  },
   titleContainer:{
     alignItems:'center',
-    marginTop:10,
-    marginBottom:20
+    marginTop: 10,
+    marginBottom: 10
   },
   title:{
-    fontSize:30
-  },
-  optionTitle:{
-    fontSize:25,
-    marginBottom:10,
-    marginLeft:20
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#333'
   },
   createContainer:{
-    backgroundColor:"white",
-    width:width-(1/10)*width,
-    alignSelf:'center',
-    borderRadius:9,
-    height:height*0.8,
-    justifyContent:'center',
-    alignItems:'center'
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  button: {
-    backgroundColor: 'lightblue',
+    backgroundColor: "white",
+    width: width * 0.9,
+    alignSelf: 'center',
+    borderRadius: 15,
     padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
+    flex: 1, 
+    marginBottom: 20,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+  scrollContent: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
-  dropdownContainer: {
-    width: 200,
-    borderWidth: 1,
-    borderColor: 'lightgray',
-    borderRadius: 5,
-    backgroundColor: 'white',
+  inputGroup: {
+    marginBottom: 15,
   },
-  dropdown: {
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  halfInput: {
+    width: '48%',
+  },
+  label:{
+    fontSize: 16,
+    marginBottom: 5,
+    fontWeight: '600',
+    color: '#555',
+    marginLeft: 5
+  },
+  pickerContainer:{
+    borderWidth: 2,
+    borderColor: "lightblue",
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  picker: {
     height: 50,
-    width: 200,
-  },
-  optionContainer:{
-    width: width/2,
-    height:100,
-    marginTop:10
-  },
-  containerSelecOptionCourse:{
-    borderWidth:2,
-    borderColor:"lightblue",
-    borderRadius:8,
-  },
-  dateTitle:{
-    fontSize:25,
-    marginBottom:10,
-  },
-  dateContainer:{
-    width: width/2,
-    height:100,
-    marginTop:50
+    width: '100%',
   },
   input:{
-    textAlign:'left',
-    borderRadius:8,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
     borderColor: 'lightblue',
-    borderWidth:2,
-},
-boxMembers:{
-  flexWrap:'wrap',
-  flexDirection:'row',
-  alignItems: 'center',
-  width: '100%'
-},
-memberButton:{
-       
-  borderColor:"lightblue",
-  borderWidth:2,
-  borderRadius:20,
-  marginTop:15,
-  marginLeft:10,
-  marginRight:10,
-  width: 85,
-  height:85,
-  alignItems:'center'
-},
-memberImage:{
-  width:50,
-  height:50
-},
-memberText:{
-  fontSize:13
-},
-rolesText:{
-  fontSize:25,
-    marginLeft:50
-},
-importantRolesContainer:{
-  marginTop:30,
-  alignItems:'center'
-},
-createButtomText:{
-  fontSize:23,
-},
-createButtom:{
-  backgroundColor: 'lightblue',
-  borderColor:'grey',
-  borderWidth:2,
-  height:50,
-  width:0.5*width,
-  padding: 10,
-  borderRadius: 5,
-  alignSelf: 'center',
-  alignItems:'center',
-  marginTop:60,
-  marginLeft:15,
-  marginBottom:10,
-},
-  
+    borderWidth: 2,
+    paddingHorizontal: 10,
+    height: 50,
+    fontSize: 16
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top', 
+    paddingTop: 10
+  },
+  // Estilos para el botón de fecha (que parece input)
+  dateButton: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    borderColor: 'lightblue',
+    borderWidth: 2,
+    paddingHorizontal: 10,
+    height: 50,
+    justifyContent: 'center',
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  // Estilos para la vista previa del título
+  previewContainer: {
+    backgroundColor: '#e6f7ff',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#1890ff',
+  },
+  previewLabel: {
+    fontSize: 12,
+    color: '#666',
+    fontWeight: 'bold',
+  },
+  previewText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#004080',
+    marginTop: 2,
+  },
+  createButton:{
+    backgroundColor: 'lightblue',
+    borderColor: '#87CEEB',
+    borderWidth: 1,
+    height: 55,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 30,
+    elevation: 3,
+  },
+  createButtonText:{
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white'
+  },
 });
-
 
 export default CreateCourse;

@@ -31,8 +31,12 @@ try {
 // 3. Crear un nuevo curso (POST /api/courses)
 export const createCourse = async (req: Request, res: Response) => {
 // Desestructura los datos del cuerpo de la solicitud
-const { title, description, startDate, endDate, location, organizerId, maxParticipants } = req.body;
+const { title, description, startDate, endDate, location, maxParticipants } = req.body;
+const organizerId = req.user?.userId;
 
+if (!organizerId) {
+    return res.status(401).json({ message: 'Unauthorized: User not identified' });
+  }
 // Validación básica (puedes añadir más validaciones con librerías como Zod o Joi)
 if (!title || !description || !startDate || !endDate || !location || !organizerId) {
   return res.status(400).json({ message: 'Missing required fields' });
