@@ -1,0 +1,128 @@
+datasource db {
+provider = "postgresql"
+url      = env("DATABASE_URL")
+}
+
+// Generador del cliente Prisma.
+// Esto creará el cliente `PrismaClient` que usarás en tu código.
+generator client {
+provider = "prisma-client-js"
+}
+
+// --- Modelos de la Base de Datos ---
+
+model User {
+id                String    @id @default(uuid()) @map("id") // UUID como ID principal
+email             String    @unique @map("email")
+passwordHash      String    @map("password_hash") // Usar camelCase en el modelo, snake_case en la DB
+name              String    @map("name")
+lastName          String    @map("last_name")
+countryOfBirth    String?   @map("country_of_birth") // `?` indica que es opcional (NULLABLE)
+cityOfResidence   String?   @map("city_of_residence")
+career            String?
+university        String?
+dateOfBirth       DateTime? @map("date_of_birth") @db.Date // Especificar tipo de DB si es necesario (solo fecha)
+role              String    @default("user") // 'user', 'admin'
+profilePictureUrl String?   @map("profile_picture_url") @db.Text // @db.Text para cadenas largas
+createdAt         DateTime  @default(now()) @map("created_at")
+updatedAt         DateTime  @updatedAt @map("updated_at") // Se actualiza automáticamente en cada cambio
+
+// Relaciones
+organizedCourses  Course[] @relation("Organizer") // Cursos que el usuario organiza
+userCourses       UserCourse[] // Cursos en los que el usuario participa
+notifications     Notification[] // Notificaciones recibidas por el usuario
+
+@@map("users") // Mapea el nombre del modelo al nombre de la tabla en la DB
+}
+
+model Course {
+id               String    @id @default(uuid()) @map("id")
+title            String
+description      String    @db.Text
+startDate        DateTime  @map("start_date")
+endDate          DateTime  @map("end_date")
+location         String
+organizerId      String    @map("organizer_id")
+status           String    @default("upcoming") // 'upcoming', 'active', 'completed', 'cancelled'
+maxParticipants  Int?      @map("max_participants")
+qrCodeUrl        String?   @map("qr_code_url") @db.Text
+createdAt        DateTime  @default(now()) @map("created_at")
+updatedAt        DateTime  @updatedAt @map("updated_at")
+
+// Relaciones
+organizer        User       @relation("Organizer", fields: [organizerId], references: [id])
+userCourses      UserCourse[] // Participantes del curso
+talks            Talk[] // Charlas dentro del curso
+notifications    Notification[] @relation("CourseNotifications") // <-- ¡Añade esta línea!
+
+@@map("courses")
+}
+
+model UserCourse {
+userId        String    @map("user_id")
+courseId      String    @map("course_id")
+roleInCourse  String    @default("participant") @map("role_in_course") // 'participant', 'speaker', 'organizer', 'staff'
+status        String    @default("pending") // 'pending', 'accepted', 'rejected', 'attended'
+joinedAt      DateTime  @default(now()) @map("joined_at")
+
+// Relaciones
+user          User      @relation(fields: [userId], references: [id])
+course        Course    @relation(fields: [courseId], references: [id])
+
+@@id([userId, courseId]) // Clave primaria compuesta
+@@map("user_courses")
+}
+
+model Speaker {
+id            String    @id @default(uuid()) @map("id")
+speakerName   String    @map("speaker_name")
+bio           String?   @db.Text
+expertise     String?
+createdAt     DateTime  @default(now()) @map("created_at")
+updatedAt     DateTime  @updatedAt @map("updated_at")
+
+// Relaciones
+talks         Talk[] // Talks que dirige este speaker
+
+@@map("speakers")
+}
+
+model Talk {
+id            String    @id @default(uuid()) @map("id")
+courseId      String    @map("course_id")
+speakerId     String    @map("speaker_id")
+title         String
+description   String?   @db.Text
+startTime     DateTime  @map("start_time")
+endTime       DateTime  @map("end_time")
+room      String
+status        String    @default("upcoming")
+createdAt     DateTime  @default(now()) @map("created_at")
+updatedAt     DateTime  @updatedAt @map("updated_at")
+
+// Relaciones
+course        Course    @relation(fields: [courseId], references: [id])
+speaker       Speaker   @relation(fields: [speakerId], references: [id])
+
+
+@@map("talks")
+}
+
+model Notification {
+id              String    @id @default(uuid()) @map("id")
+userId          String    @map("user_id")
+type            String
+title           String
+message         String    @db.Text
+relatedCourseId String?   @map("related_course_id")
+relatedTalkId   String?   @map("related_talk_id")
+isRead          Boolean   @default(false) @map("is_read")
+sentAt          DateTime  @default(now()) @map("sent_at")
+
+// Relaciones
+user            User      @relation(fields: [userId], references: [id])
+relatedCourse   Course?   @relation("CourseNotifications",fields: [relatedCourseId], references: [id])
+
+
+@@map("notifications")
+}

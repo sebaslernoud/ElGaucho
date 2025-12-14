@@ -1,0 +1,824 @@
+{
+	"info": {
+		"_postman_id": "9cbdb234-c82b-4c5f-92ab-49b7eb043465",
+		"name": "ElGaucho",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46782138"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"sebasl@gmail.com\",\n    \"password\": \"sebas\",\n    \"name\": \"Sebastian\",\n    \"lastName\": \"Lernoud\",\n    \"role\": \"user\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"sebasl@gmail.com\",\r\n    \"password\": \"sebas\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"test-admin@example.com\",\r\n    \"password\": \"password123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "profile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxNjc5NTVkOS1lNjhiLTQ1MzYtYTBhZi1lN2UxNzg5M2I2ZWYiLCJlbWFpbCI6InNlYmFzbEBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MzEzMDE1OSwiZXhwIjoxNzUzMTMzNzU5fQ.VBfCwW4TkgQG3jmCopNY4kCOKQq-wOo1b9y6r_6fQCg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/users/profile",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin-data",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMwNTU3MTksImV4cCI6MTc1MzA1OTMxOX0.9ULaH1qqhVmeXfbSjLGW9K4U4Pu0AD1gxHILbdjcBGg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "aut",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/users/admin-data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"admin-data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notifications",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxNjc5NTVkOS1lNjhiLTQ1MzYtYTBhZi1lN2UxNzg5M2I2ZWYiLCJlbWFpbCI6InNlYmFzbEBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MzEzMTc4MywiZXhwIjoxNzUzMTM1MzgzfQ.cS_jzyP_2TvLsoZqZofGje7nZauDZVV6yG6EKQpBBZ0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userId\": \"167955d9-e68b-4536-a0af-e7e17893b6ef\",\r\n  \"type\": \"normal\",\r\n  \"title\": \"RELUL 2024\",\r\n  \"message\": \"Usted ya es parte de la RELUL 2024\",\r\n  \"relatedCourseId\": \"3d6be15d-400c-4ee7-921b-c4aab5675bdd\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/notifications",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"notifications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notifications",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxNjc5NTVkOS1lNjhiLTQ1MzYtYTBhZi1lN2UxNzg5M2I2ZWYiLCJlbWFpbCI6InNlYmFzbEBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MzEzMTc4MywiZXhwIjoxNzUzMTM1MzgzfQ.cS_jzyP_2TvLsoZqZofGje7nZauDZVV6yG6EKQpBBZ0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/notifications",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"notifications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "course",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/courses",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"courses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "course:id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMwMjkwMTAsImV4cCI6MTc1MzAzMjYxMH0.6SvFr4PuZdrXssoOEg9f2kqOjRdeOvn_WT0nZAts4pE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"RELUL 2023\",\r\n    \"description\": \"Un curso completo para aprender a liderar\",\r\n    \"startDate\": \"2025-08-01T09:00:00Z\",\r\n    \"endDate\": \"2025-08-30T17:00:00Z\",\r\n    \"location\": \"Online\",\r\n    \"organizerId\": \"d80c154b-2e4a-4dda-8ef5-47bd8a336844\",\r\n    \"maxParticipants\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/courses/3d6be15d-400c-4ee7-921b-c4aab5675bdd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"courses",
+						"3d6be15d-400c-4ee7-921b-c4aab5675bdd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "course",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzYyNjUsImV4cCI6MTc1MzEzOTg2NX0.GLHyXdp7lZ663naF4yOTUsM1zvBbkhV8q8wHUYwmK3E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"RELUL 2023\",\r\n    \"description\": \"Un curso completo para aprender a liderar\",\r\n    \"startDate\": \"2025-08-01T09:00:00Z\",\r\n    \"endDate\": \"2025-08-30T17:00:00Z\",\r\n    \"location\": \"Online\",\r\n    \"organizerId\": \"d80c154b-2e4a-4dda-8ef5-47bd8a336844\",\r\n    \"maxParticipants\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/courses",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"courses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "course",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzQwNzQsImV4cCI6MTc1MzEzNzY3NH0.oxeeA8rOBhptQN4maxNjGhq9_rvIzl2ZVfZNv_pJQI8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"title\": \"RELUL 2023\",\r\n\"description\": \"Un curso completo para aprender a liderar\",\r\n\"startDate\": \"2025-08-01 09:00:00.000\",\r\n\"endDate\": \"2025-08-30 17:00:00.000\",\r\n\"location\": \"Pilar\",\r\n\"organizerId\": \"d80c154b-2e4a-4dda-8ef5-47bd8a336844\",\r\n\"status\": \"active\",\r\n\"maxParticipants\": 100,\r\n\"qrCodeUrl\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/courses/3d6be15d-400c-4ee7-921b-c4aab5675bdd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"courses",
+						"3d6be15d-400c-4ee7-921b-c4aab5675bdd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "course",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzQwNzQsImV4cCI6MTc1MzEzNzY3NH0.oxeeA8rOBhptQN4maxNjGhq9_rvIzl2ZVfZNv_pJQI8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/courses/3d6be15d-400c-4ee7-921b-c4aab5675bdd",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"courses",
+						"3d6be15d-400c-4ee7-921b-c4aab5675bdd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userCourse",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxNjc5NTVkOS1lNjhiLTQ1MzYtYTBhZi1lN2UxNzg5M2I2ZWYiLCJlbWFpbCI6InNlYmFzbEBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTc1MzEzNzM3OSwiZXhwIjoxNzUzMTQwOTc5fQ.wAdr2mytMs67RJ0ZY1IdEOwEjxS6nomuVhTOdQGWrA8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/user-courses/user/167955d9-e68b-4536-a0af-e7e17893b6ef",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user-courses",
+						"user",
+						"167955d9-e68b-4536-a0af-e7e17893b6ef"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userCourse",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzY4MDgsImV4cCI6MTc1MzE0MDQwOH0.ivqmDx3mfGdCDiBc_m24BPg599BxEMijNqNNG-M-q6o",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"userId\": \"167955d9-e68b-4536-a0af-e7e17893b6ef\",\r\n\"courseId\": \"572c0391-bcee-4900-81bb-c2c6e3caa2f7\",\r\n\"roleInCourse\": \"Asistido\",\r\n\"status\": \"accepted\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user-courses",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user-courses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "talk",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/talks",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"talks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "talk:id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMwMjkwMTAsImV4cCI6MTc1MzAzMjYxMH0.6SvFr4PuZdrXssoOEg9f2kqOjRdeOvn_WT0nZAts4pE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/talks/TALK_ID",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"talks",
+						"TALK_ID"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "talk",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzYyNjUsImV4cCI6MTc1MzEzOTg2NX0.GLHyXdp7lZ663naF4yOTUsM1zvBbkhV8q8wHUYwmK3E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Leadership Basics\",\n    \"description\": \"Un talk completo sobre liderazgo\",\n    \"date\": \"2025-12-15T14:00:00Z\",\n    \"location\": \"Online\",\n    \"speakerId\": \"d80c154b-2e4a-4dda-8ef5-47bd8a336844\",\n    \"maxAttendees\": 50\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/talks",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"talks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "talk",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzQwNzQsImV4cCI6MTc1MzEzNzY3NH0.oxeeA8rOBhptQN4maxNjGhq9_rvIzl2ZVfZNv_pJQI8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Advanced Leadership\",\n    \"description\": \"Un talk avanzado sobre liderazgo\",\n    \"date\": \"2025-12-15T14:00:00Z\",\n    \"location\": \"Buenos Aires\",\n    \"speakerId\": \"d80c154b-2e4a-4dda-8ef5-47bd8a336844\",\n    \"status\": \"active\",\n    \"maxAttendees\": 75,\n    \"qrCodeUrl\": \"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/talks/TALK_ID",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"talks",
+						"TALK_ID"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "talk",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzQwNzQsImV4cCI6MTc1MzEzNzY3NH0.oxeeA8rOBhptQN4maxNjGhq9_rvIzl2ZVfZNv_pJQI8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/talks/TALK_ID",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"talks",
+						"TALK_ID"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "speaker",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/speakers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"speakers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "speaker:id",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMwMjkwMTAsImV4cCI6MTc1MzAzMjYxMH0.6SvFr4PuZdrXssoOEg9f2kqOjRdeOvn_WT0nZAts4pE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/speakers/SPEAKER_ID",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"speakers",
+						"SPEAKER_ID"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "speaker",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzYyNjUsImV4cCI6MTc1MzEzOTg2NX0.GLHyXdp7lZ663naF4yOTUsM1zvBbkhV8q8wHUYwmK3E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"speakerName\": \"John Doe\",\n    \"bio\": \"Experto en liderazgo y desarrollo personal\",\n    \"expertise\": \"Leadership, Personal Development\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/speakers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"speakers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "speaker",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzQwNzQsImV4cCI6MTc1MzEzNzY3NH0.oxeeA8rOBhptQN4maxNjGhq9_rvIzl2ZVfZNv_pJQI8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"speakerName\": \"Jane Smith\",\n    \"bio\": \"Especialista en transformación digital\",\n    \"expertise\": \"Digital Transformation, Innovation\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/speakers/SPEAKER_ID",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"speakers",
+						"SPEAKER_ID"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "speaker",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkODBjMTU0Yi0yZTRhLTRkZGEtOGVmNS00N2JkOGEzMzY4NDQiLCJlbWFpbCI6InRlc3QtYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTMxMzQwNzQsImV4cCI6MTc1MzEzNzY3NH0.oxeeA8rOBhptQN4maxNjGhq9_rvIzl2ZVfZNv_pJQI8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/speakers/SPEAKER_ID",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"speakers",
+						"SPEAKER_ID"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,16 @@
+"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAEVklEQVR4nO2Za4hVVRTHf2aFMuOQmq8glVBMywcqaVRWWl8CMy0isxKMFPoQDI5oOmlN5aOiCMSiKPCLoB/SfJRGoHgh08ohX5kwajZS42Ocns40zdxY8T+yul3vPefO7t6B7h82nLPP2v+19tl7rbPWPlBCCSWUkBC9gXeA80Cjrq91z+36XT0zmfeBAXQyDAZOAKm01gBMVWvI8PxHYDSdBBXAERl2DJgg43ZlMHyXnln7Un2nO8vKvOUm0cv1XwE8A9QD3+va+iJ0Az7X2A0UGUOBNuAP4JY8x/+qyYyiiHhTRphj54vXxbGaIuKUjBjXAY7R4viOImGgDDgDdOkgVxTRBlIEPCjlHwfg+khcMygCVkj5SwG4XhTXyxQBn0r59ABc08X1CQWG+cQFKb8+oL81BvC3RBgixWcDclrQMM4bKCAeCujoEbYH3Kqx8YKULg/IaVzG+TwFxCYpfSQg50xxbgxB1geoAfYrB2oCvgKWAH2d3HEpvYlwMC7jrHN9/YBq2dAkm/ZrR/ha5x+wvflThtQ7aueAB5S2twPNwFUBJ2JczeKukD3nstjTJHv+NYk2CWwG7gLK1O4GtuhZK7BK17WER624V0mXXX+YxZ42P5k+biWezaKkOu2NrP0PJrI2TUc2e5ZI5kK0zWrcSuTCVqpekivCocvwWUHJhi4900XLa8uXCZKdoN3Ad4WBcux3/nQnssQDAz7opjzGwPEMAeA7o34EJ2NilGRy7LMbYHpK1OfC7bqyGjoNfJL/XKTWn+wxYCTwOjFeqYTX81Wq91DdeMia7xwUZz2k64qC75G0Of59ipBK81TrJj9TSmm9dzBImc7WLikwWjca4g4y42zGlAw4O6WZEzMEbJf+w67NtMA1YBqyX39Upm21Ra1RfrWRM9v60LfSEuO15HIyU/AG72aYbSxHiYJ7kLckLjb3inhVTfrb71lyqztbEHFyh9L1dWXAoLJQdJxL463saYwGH23TzbYKi5jGNaVHsN2fOF311Jmx8fwL3xhzXVScvqehMzTpOqsOcNy4WaVWiY8+3tT0tKg0CegLXSPZK3VslOEzGVurQoVkcvyXY3r48PuYXYIELf/5YMxcmKzPNN2JFq/CBDsKTJJjfaPzT6fE4WpXFJMdw7fEoYp1UlIrq+jbd/6DItUfbaZ5S9aR4Q7xHM2XgU/R2rD1K50Wl88+JlxOa75a7qtAnGjlgfvaK7DPffDLXgAXOiXcAN1J8TAC+cDXR3LgD79O3IqVfBlYnjKWw6KKMfLN7sfaf5Y58/gmucZWatcOqX25P8NFKgnL56qsu+ET52MqYGfplMUjE6Wm2Ods+rdZifQMs8btZCWhPpdkReqivv3KkKQoq9lVep5qiNU1HvYomf/ARxNnu0Q+Zr9PS71CtVS/nNa16km9a3rCcaxLwlFZsg352Htb/jkZXtKV0LhB9Sw4CO7USdtAwB7g1ZjFVQgkl/J/xF3hYpt3VcI5SAAAAAElFTkSuQmCC"
+
+
+
+<Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)/register" options={{ title: 'Registro' }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="Course" options={{ title: 'Curso' }} />
+      <Stack.Screen name="Members" options={{ title: 'Miembros' }} />
+      <Stack.Screen name="Talk" options={{ title: 'Charla' }} />
+      <Stack.Screen name="profile" options={{ title: 'Perfil' }} />
+      <Stack.Screen name="JoinCourse" options={{ title: 'Unirse a Curso' }} />
+      <Stack.Screen name="ActualCourse" options={{ title: 'Curso Actual' }} />
+      <Stack.Screen name="CourseIn" options={{ title: 'Curso Participado' }} /> 
+      
