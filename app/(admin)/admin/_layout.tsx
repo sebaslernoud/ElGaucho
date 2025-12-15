@@ -11,7 +11,7 @@ export default function AdminLayout() {
       }}
     >
       <Tabs.Screen
-        name="admin/AdminHome"
+        name="AdminHome"
         options={{
           title: 'Cursos',
           tabBarLabel: 'Cursos',
@@ -22,7 +22,7 @@ export default function AdminLayout() {
         }}
       />
       <Tabs.Screen
-        name="admin/AdminNotifications"
+        name="AdminNotifications"
         options={{
           title: 'Notificaciones',
           tabBarLabel: 'Notificaciones',
@@ -33,7 +33,7 @@ export default function AdminLayout() {
         }}
       />
       <Tabs.Screen
-        name="admin/AcceptInvitations"
+        name="AcceptInvitations"
         options={{
           title: 'Invitaciones',
           tabBarLabel: 'Invitaciones',
