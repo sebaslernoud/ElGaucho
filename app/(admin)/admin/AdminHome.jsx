@@ -68,7 +68,9 @@ const AdminHome = () => {
 
     // Render items
     const renderActiveItem = ({ item }) => (
-        <TouchableOpacity style={styles.blockItem} onPress={() => router.push('/admin/ActualCourseAdmin')}>
+        <TouchableOpacity style={styles.blockItem} onPress={() => router.push({
+                                    pathname: '/components/CourseAdmin', 
+                                    params: { courseId: item.id}})}>
             <View style={styles.nameBoxItem}>
                 <Text style={styles.nameItem}>{item.name}</Text>
             </View>
@@ -78,7 +80,10 @@ const AdminHome = () => {
     const renderAllItem = ({ item }) => (
         <TouchableOpacity 
             style={styles.blockItem} 
-            onPress={() => router.push({ pathname: '/admin/AdminHome', params: { screen: 'CourseAdmin', courseId: item.id } })}
+            onPress={() => router.push({ 
+                pathname: '/components/CourseAdmin', 
+                params: { courseId: item.id } 
+            })}
         >
             <View style={styles.nameBoxItem}>
                 <Text style={styles.nameItem}>{item.name}</Text>

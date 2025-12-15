@@ -1,10 +1,10 @@
+import DateTimePicker from '@react-native-community/datetimepicker'; // Importar el calendario
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
-import { Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Dimensions, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import DateTimePicker from '@react-native-community/datetimepicker'; // Importar el calendario
-import { createCourse } from '../../../src/services/courseService';
+import { createCourse } from '../../src/services/courseService';
 
 const { width } = Dimensions.get('window');
 

@@ -13,19 +13,29 @@ try {
 
 // 2. Obtener un curso por ID (GET /api/courses/:id)
 export const getCourseById = async (req: Request, res: Response) => {
-const { id } = req.params; // Obtiene el ID de los parámetros de la URL
-try {
-  const course = await prisma.course.findUnique({
-    where: { id },
-  });
+  const { id } = req.params;
+  try {
+    const course = await prisma.course.findUnique({
+      where: { id },
+      include: {
+        talks: {
+            include: { speaker: true } // Incluimos info del speaker en la charla
+        },
+        userCourses: {
+          include: {
+            user: true, // Incluimos info del usuario participante
+          },
+        },
+      },
+    });
 
-  if (!course) {
-    return res.status(404).json({ message: 'Course not found' });
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    res.status(200).json(course);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error fetching course', error: error.message });
   }
-  res.status(200).json(course);
-} catch (error: any) {
-  res.status(500).json({ message: 'Error fetching course', error: error.message });
-}
 };
 
 // 3. Crear un nuevo curso (POST /api/courses)
