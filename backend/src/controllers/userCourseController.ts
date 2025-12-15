@@ -10,6 +10,45 @@ declare global {
  }
 }
 
+
+export const getPendingRequests = async (req: Request, res: Response) => {
+  try {
+    const pendingRequests = await prisma.userCourse.findMany({
+      where: { status: 'pending' },
+      include: {
+        user: { select: { id: true, name: true, lastName: true, email: true } },
+        course: { select: { id: true, title: true } },
+      },
+    });
+    res.status(200).json(pendingRequests);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error fetching pending requests', error: error.message });
+  }
+};
+
+// Actualizar estado (Aceptar/Rechazar)
+export const updateRequestStatus = async (req: Request, res: Response) => {
+  const { courseId, userId } = req.params;
+  const { status } = req.body; // Esperamos 'accepted' o 'rejected'
+
+  if (!['accepted', 'rejected'].includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  try {
+    const updatedUserCourse = await prisma.userCourse.update({
+      where: {
+        userId_courseId: { userId, courseId }, // Clave compuesta definida en Prisma
+      },
+      data: { status },
+    });
+    res.status(200).json(updatedUserCourse);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error updating request status', error: error.message });
+  }
+};
+
+
 /**
 * Creates a new UserCourse entry (e.g., a user registers for a course).
 * POST /api/user-courses

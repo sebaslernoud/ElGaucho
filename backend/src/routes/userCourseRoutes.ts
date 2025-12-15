@@ -4,9 +4,18 @@ import {
  createUserCourse,
  getUserCoursesByUserId,
  getUserCoursesByStatus,
+ getPendingRequests,
+  updateRequestStatus
 } from '../controllers/userCourseController'; // Import the new controller functions
 
 const router = Router();
+
+// GET: Obtener pendientes (Solo admin)
+router.get('/pending', authenticateToken, authorizeRoles(['admin']), getPendingRequests);
+
+// PUT: Responder solicitud (Solo admin)
+router.put('/:courseId/:userId/status', authenticateToken, authorizeRoles(['admin']), updateRequestStatus);
+
 
 // POST /api/user-courses - Create a new UserCourse entry (e.g., user registers for a course)
 // Requires authentication. You might want to add role authorization here too,

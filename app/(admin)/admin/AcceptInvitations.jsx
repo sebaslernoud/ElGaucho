@@ -1,124 +1,197 @@
-import { useRouter } from 'expo-router';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-const { width, height } = Dimensions.get('window');
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View, Alert, Image } from 'react-native';
+import { useSelector } from 'react-redux';
+import { getPendingRequests, respondToRequest } from '../../src/services/userCourseService';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; // Usaremos iconos vectoriales mejor
 
-const requests = [
-    { id: '1', name: "Sebastian Lernoud", role: "Asistido", course: 'RELUL 2020'},
-    { id: '2', name: "Pucho Lopez", role: "Tallerista", course:'RELUL 2022'},
-    { id: '3', name: "Juan Maria Quotre", role: "Tallerista", course: 'RELAL 2023'},
-    // Agrega más cursos aquí según sea necesario
-];
+const { width } = Dimensions.get('window');
 
-const RequestList = () => {
-    const router = useRouter();
-    const renderItem = ({ item, index }) => {
-        return(
-        <View style={styles.blockItem}>
-            <View style={styles.nameBoxItem}>
-                <Text style={styles.nameItem}>{item.name}</Text>
-                <TouchableOpacity style={styles.acceptButtom} title="Ir a Curso"
-        onPress={() => router.push({ pathname: '/admin/AcceptInvitations', params: { screen: 'CourseAdmin' } })}>
-                    <Image style={styles.acceptImage} source={{uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAACT0lEQVR4nO2ZPWhUQRDHf36gYqJETIIgCBYpFEylWGos7GLIh502YpnYidjlo7EN2KZKlUo9GzttbMQk2mihpAqCKJyeMQGNriz8Hzww4e2+XPbtJfuDbY6ZnZm3s7szt5BIJLZCNzAFLAIrgAk8VoAFYBLoKhvECNCowHmzyfgODJUJ4q8meARcAtoITxtwGXgsX/4Agz7plK3EXeLhnnz6BnS6KEzlViI2avJtwkX4jYRtOsVGn3yzB0AhPyTcTnwckW829QvJTolYMa7+pUACYdKKBObgTliREeAjcLaVA7kIrMr2nVYN5CSwLLszBbLRBmIvubey+QI40IqB7AWeyN574JiDTpSBTMvWV6DHUSe6QG7Lzi8Vg65EFchV4Leat5ueuqaZgewD5oBb+HMGqMuG7X2oMpBhydgvOubhhO0+l6RrP8QeD91tS61R9dBW9oGD/CHgpeRfA4ddnAm1R24o1638Qx2nG2G//KzklnUBlsVs12a/BqxJxzq7fwOZ8Vxn1+sxd/BTqy/3z0tNaZRxXXtpHej3nLeS4/cC8EW6z1V6nAd+6jefQ6Hye+Qc8En6r4DPuf3TLEyoC/E08CE3z7NN9k1ZTMib/YQq2ndAB83FhC5RjgOnaD4mplprK5gUSGSYXbcijYj/xD6ae70qZFHC9qUoNq7It3kX4UkJ2+eu2Hgq32wRWkiXls7ouSsW7sunuu4oJ4ZyTVNN1W0Ve6Zd6ZSthPVpwHeSQT08mkhGvUwQGZ16eJzPPcmFHA21xeM+6ZRIJPiPfwtEbQPoqffwAAAAAElFTkSuQmCC'}}></Image>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.courseBoxItem}>
-                <Text style={styles.roleItem}>{item.course}{"    "}{item.role}</Text>
-                <TouchableOpacity style={styles.denyButtom} >
-                    <Image style={styles.denyImage} source={{uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADnUlEQVR4nO2aSU8UURDHf0aEMRiRQUBvcjQY9UuooKjIze2m0YtL0KvLGT2ZmPA5NEggUYMrAu6JAsrJ5aLx5ghRM6biv5MKztLd07NI+CedDLyq6nqv6tWrqtewjKWLNNALXAGGgGngG7Cgx36/1ZjR7AeaqRGkgKPAKPAbyEZ8fgEjwBGgoRoTWA2cAz47peaBO8AFWWazVnyVnmb9z8YuAnfFE/B/Avq1OBXBHmDOKTAJHAOaYshaBxwHppy890A3ZYSt1KB74VNgZ4Lyu4DnTv71clhngxS3F3wHTgErk34Jf2WeATLO2u1JCe+QubOKOlsoP7YCM3rnO+lQElqdwAlgPZVDM/BA756TV8RCyrnTI6CRyqMRGHduFmvPDDp3ssOuWmhxXmEBIHKIDTZ2JfZEmD2TkU4W3UIfdsE5YdGpVnDWbf5QLnbenRPlCLFxUQe8kG42qYJoUKpgxDuoPeyWbp+LWeWIixBhcU8pRlsMxdpk+fsh6Ve4SHqoEOGoiCx3CosJ8byOOJk28Rjvkwh8J8QznI8grbR6PmIC6BUKO5k4PP6gtPrmZz49D0jwbeJlAK/cubMxAm2cE3tM/HtzDV7VoNUTcRBmlUuxhMdlyRggB4Y0uI/4KGSZJCyx2HtukAOzGrQqrhTkWvWkLBGgU7KsL/APvmrQcptSsVjxJCeBsnCT94UcWNBgPcnAu1IS7rT44A76BFWZSKFoFgUFJ7JkXGt2qWz2IQ1aBzAuCoXYKIdmMfQVCr/BgWjNs//6QOzVoHULoyLKYZeEZcbE35MvGQuSRusA1mrSmHZJ49p8RCMSbm3MsJhMII23UiAsTornViGiwyKyQiksHpdYWE1JRhhYYfVMOh4sdtB8FOEuag890u1DmGuIfhE/q8Hmw0vpdjoMQ8r1eq2hXCvol04zUS6FusWUUXOs2tgO/JBOka8yrrsVSCL/iotWNeVMl2txBKRcaB2vUhN7jTosQaeloZTVmHax3v6uFNLAQ3cdV/KFT4czrbnZNiqzJ97pnZaVb0pKcLtzs4x6rxYOk0adotMP505J1C//7JkgAGTVUE7q9nWFrjJeOvnXyn333uXMHnTtT8T8iiGt3ClIO7JypSRvi4ta56xLZ7LKSC29vqS+U6fCdr2eFl0a9YlmzPUJgrTjdLW+gGhQV3xYJUA24vNTlenBak0gF5rUi7Wq7aaKpq/uoxr7/Ubl6YBo89YTy+A/xx+3026HVKnF7QAAAABJRU5ErkJggg=='}}></Image>
-                </TouchableOpacity></View>
-        </View>
-        )
+const AcceptInvitations = () => {
+    const authState = useSelector(state => state.auth);
+    const token = authState?.token;
+
+    const [requests, setRequests] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    // Cargar datos al entrar a la pantalla
+    const fetchRequests = async () => {
+        if (!token) return;
+        setLoading(true);
+        try {
+            const data = await getPendingRequests(token);
+            setRequests(data);
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Error", "No se pudieron cargar las invitaciones.");
+        } finally {
+            setLoading(false);
+        }
     };
-  
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchRequests();
+        }, [token])
+    );
+
+    // Manejar Aceptar/Rechazar
+    const handleResponse = async (courseId, userId, status) => {
+        try {
+            await respondToRequest(courseId, userId, status, token);
+            // Actualizar lista localmente eliminando el item procesado
+            setRequests(prev => prev.filter(req => !(req.courseId === courseId && req.userId === userId)));
+            
+            // Feedback visual opcional
+            // Alert.alert("Éxito", `Solicitud ${status === 'accepted' ? 'aceptada' : 'rechazada'}`);
+        } catch (error) {
+            Alert.alert("Error", "No se pudo actualizar la solicitud.");
+        }
+    };
+
+    const renderItem = ({ item }) => {
+        return (
+            <View style={styles.card}>
+                <View style={styles.infoContainer}>
+                    <Text style={styles.userName}>{item.user.name} {item.user.lastName}</Text>
+                    <Text style={styles.userEmail}>{item.user.email}</Text>
+                    <Text style={styles.courseName}>Curso: {item.course.title}</Text>
+                </View>
+                
+                <View style={styles.actionsContainer}>
+                    {/* Botón Aceptar */}
+                    <TouchableOpacity 
+                        style={[styles.actionButton, styles.acceptButton]} 
+                        onPress={() => handleResponse(item.courseId, item.userId, 'accepted')}
+                    >
+                        <MaterialCommunityIcons name="check" size={24} color="white" />
+                    </TouchableOpacity>
+
+                    {/* Botón Denegar */}
+                    <TouchableOpacity 
+                        style={[styles.actionButton, styles.denyButton]} 
+                        onPress={() => handleResponse(item.courseId, item.userId, 'rejected')}
+                    >
+                        <MaterialCommunityIcons name="close" size={24} color="white" />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    };
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />;
+    }
+
     return (
-      <FlatList style = {styles.coursesList}
-        data={requests}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <Text style={styles.title}>Solicitudes Pendientes</Text>
+            </View>
+
+            {requests.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>No hay solicitudes pendientes.</Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={requests}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => `${item.userId}-${item.courseId}`}
+                    contentContainerStyle={styles.listContent}
+                />
+            )}
+        </View>
     );
 };
 
-
-const AcceptInvitations = (props) => {
-
-    return(
-        <View style={styles.container}>
-            <View style={styles.titleContainer}>
-                <Text style={styles.title}>Aceptar participantes</Text>
-            </View>
-            <View style = {styles.bigBlock}>
-                <View style = {styles.requestTitleContainer}>
-                    <Text style={styles.requestTitle}>Solicitudes</Text>
-                </View>
-                <View style = {styles.requestsContainer}>
-                    <RequestList></RequestList>
-                </View>
-            </View>
-
-        </View>
-    )
-
-};
-
 const styles = StyleSheet.create({
-    titleContainer:{
-        alignItems:'center',
-        marginTop:35
+    container: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
     },
-    title:{
-        fontSize:25
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
     },
-    bigBlock:{
-        marginTop:40    ,
-        width:0.9*width,
-        height:0.7*height,
-        backgroundColor:"white",
-        alignSelf:'center',
-        borderRadius:9
+    header: {
+        paddingTop: 50,
+        paddingBottom: 20,
+        alignItems: 'center',
+        backgroundColor: 'white',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
     },
-    requestTitleContainer:{
-        alignItems:'center',
-        marginTop:20,
+    title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#333',
     },
-    requestTitle:{
-        fontSize:20
+    listContent: {
+        padding: 15,
     },
-    blockItem:{
-        backgroundColor:"lightblue",
-        marginTop:30,
-        marginBottom:15,
-        height:90,
-        marginLeft: 15,
-        marginRight: 15,
-        borderRadius:9
-    },
-    nameBoxItem:{
-        flexDirection: 'row', // Poner en horizontal
-        marginBottom:15,
-        marginTop:10,
-        alignSelf:'center'
-    },
-    courseBoxItem:{
+    card: {
         flexDirection: 'row',
-        alignSelf:'center'
+        backgroundColor: 'white',
+        borderRadius: 12,
+        padding: 15,
+        marginBottom: 15,
+        alignItems: 'center',
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
-    acceptImage:{
-        width:30,
-        height:30,
+    infoContainer: {
+        flex: 1,
     },
-    denyImage:{
-        width:30,
-        height:30,
+    userName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
     },
-    acceptButtom:{
-        marginLeft:50
+    userEmail: {
+        fontSize: 14,
+        color: '#666',
+        marginBottom: 5,
     },
-    denyButtom:{
-        marginLeft:35
+    courseName: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#009AFF', // Azul temático
+    },
+    actionsContainer: {
+        flexDirection: 'row',
+        marginLeft: 10,
+    },
+    actionButton: {
+        width: 45,
+        height: 45,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 10,
+        elevation: 2,
+    },
+    acceptButton: {
+        backgroundColor: '#4CAF50', // Verde
+    },
+    denyButton: {
+        backgroundColor: '#F44336', // Rojo
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyText: {
+        fontSize: 16,
+        color: '#888',
     }
 });
-
-
 
 export default AcceptInvitations;
