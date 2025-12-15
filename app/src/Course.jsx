@@ -1,204 +1,264 @@
-import React, { useState } from 'react';
-import { View, Text,FlatList, TextInput, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-const { width, height } = Dimensions.get('window');
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View, ScrollView, Alert } from 'react-native';
+import { useSelector } from 'react-redux';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker'; // <--- Importar Picker
 
+import { getCourseById } from './services/courseService'; //
+import { joinCourse } from './services/userCourseService'; //
 
+const { width } = Dimensions.get('window');
 
-  
-const TalksList = () => {
-  const navigation = useNavigation();
-    const talks = [
-        { id: '1', title:   'Liderar'},
-        { id: '2', title: 'Negociar'},
-        { id: '3', title: 'Emprender'},
-        // Agrega más cursos aquí según sea necesario
-    ];
-    const renderItem = ({ item }) => {
-    return(
-        <View style = {styles.talkElement}>
-            <View style={styles.imageContainer}>
-                    <Image style={styles.image}  source={{uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAChklEQVR4nO2ZTYiNURjHfwxmyGCBzIJ8jFJiw4Zu2SBcFqyEhSIfGxGNFYmJWEmp2SkfxVgJKZJMo2ZEUxLJQiNfYchsyMc908lfvd3c+973Pe91jnp/9azuOf/+zz1fzzkv5OT8VzQABWAf0AF0AheBk8B6YAyB0wi0AW8BUyXeAUUCZQbwOGL2IXBKo7JBI7Ef6Nbv34EzwDICYhLQL4M9wIKY9gfLRugqMI4AuCRDdzS94hgGTAe2Aa/V9xqemQmUgK9Aa4r+04ABJbMCj+ySifMOGocy0HDmikxsdNCYL40neKRXJuIWeDVGAT+BHzqDvPBciaRZH1HsdmyUlBeeysAsBw07Cr8U3kakS4ksctCYKo03eKRTJtY5aCyVxl08ckAmDjtotEujHY8UZeKGg8Y9aSzHI2tlYkClR1ImRnasAh7pkYmdKfuPAI5I4wIe6c/gHFksjS48cl0mNjlo7JDGWTyyXSZeAHtSFowvM6jXnBkZKRyTFn12c/isa8Bln6f6H4YDgyr8mhP0a9Uf8IyAuJlirbSpj727B8NWmXpQ43nSqHVl+6wiIEZHFu3xGtqfU9s+Tc2gWJ2gijUZXMjqRkuKRIKkJU8kMIoakW96fazElMjUWkhgrAQ+RgzaHWw3MBcYqyfReX955H4FLCEACnq7LcW8wFcL2/cWsCblncbpzNgCPHIwXyn6gM1AUz0TmAwcBT7UIYHyeK87vL1BZkaD5vbgP0jAlMUXYG8Wp/8EfS4wnuM2MD5tEs0qAk0gcV87YGI6AjBvyuJ00iTmOG6p9YoSMDtJIicCMG0qxLE071UhRneSRD4FYNhUCPuqWRNNAZg1MVHL1+OcnBx+MwTQ0ifIg+pOMwAAAABJRU5ErkJggg=="}} />
-            </View>
-        <TouchableOpacity style={styles.talk} title="Ir a Charla"
-            onPress={() => navigation.navigate('Charla')}>
-            <Text style={styles.title}>{item.title}</Text>
-        </TouchableOpacity>
-      </View>
-      )
-    };
-  
-    return (
-      <FlatList style = {styles.coursesList}
-        data={talks}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
-    );
-  }; 
-
-
-const ParticipantsList = () => {
-    const navigation = useNavigation();
-    const participants = [
-        { id: '1', title: 'Sebastian', role: "Asistido" },
-        { id: '2', title: 'Joaquin', role: "Tallerista" },
-        { id: '3', title: 'Pedro', role: "Asistente" },        
-        // Agrega más participantes aquí según sea necesario
-    ];
-
+const Course = () => {
+    const { courseId } = useLocalSearchParams();
+    const router = useRouter();
     
+    const authState = useSelector(state => state.auth);
+    const token = authState?.token;
+    const user = authState?.user;
 
-    const renderItem = ({ item,index }) => {
-  
-        return(
-          <TouchableOpacity style={styles.item} title="Ir a Perfil"
-          onPress={() => navigation.navigate('Perfil')}>
-            <Image style={styles.memberImage} source={{uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAChklEQVR4nO2ZTYiNURjHfwxmyGCBzIJ8jFJiw4Zu2SBcFqyEhSIfGxGNFYmJWEmp2SkfxVgJKZJMo2ZEUxLJQiNfYchsyMc908lfvd3c+973Pe91jnp/9azuOf/+zz1fzzkv5OT8VzQABWAf0AF0AheBk8B6YAyB0wi0AW8BUyXeAUUCZQbwOGL2IXBKo7JBI7Ef6Nbv34EzwDICYhLQL4M9wIKY9gfLRugqMI4AuCRDdzS94hgGTAe2Aa/V9xqemQmUgK9Aa4r+04ABJbMCj+ySifMOGocy0HDmikxsdNCYL40neKRXJuIWeDVGAT+BHzqDvPBciaRZH1HsdmyUlBeeysAsBw07Cr8U3kakS4ksctCYKo03eKRTJtY5aCyVxl08ckAmDjtotEujHY8UZeKGg8Y9aSzHI2tlYkClR1ImRnasAh7pkYmdKfuPAI5I4wIe6c/gHFksjS48cl0mNjlo7JDGWTyyXSZeAHtSFowvM6jXnBkZKRyTFn12c/isa8Bln6f6H4YDgyr8mhP0a9Uf8IyAuJlirbSpj727B8NWmXpQ43nSqHVl+6wiIEZHFu3xGtqfU9s+Tc2gWJ2gijUZXMjqRkuKRIKkJU8kMIoakW96fazElMjUWkhgrAQ+RgzaHWw3MBcYqyfReX955H4FLCEACnq7LcW8wFcL2/cWsCblncbpzNgCPHIwXyn6gM1AUz0TmAwcBT7UIYHyeK87vL1BZkaD5vbgP0jAlMUXYG8Wp/8EfS4wnuM2MD5tEs0qAk0gcV87YGI6AjBvyuJ00iTmOG6p9YoSMDtJIicCMG0qxLE071UhRneSRD4FYNhUCPuqWRNNAZg1MVHL1+OcnBx+MwTQ0ifIg+pOMwAAAABJRU5ErkJggg=="}} />
-            <Text style={styles.title}>{item.title}</Text>
-          </TouchableOpacity>
-          )
-    };
-  
-    return (
-      <FlatList style = {styles.participantsList}
-        data={participants}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        numColumns={3}
-      />
-    );
-  }; 
+    const [course, setCourse] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [joining, setJoining] = useState(false);
+    
+    // Estado para el rol seleccionado (por defecto 'Asistido')
+    const [selectedRole, setSelectedRole] = useState('Asistido');
 
-const Course = (props) => {
-  const navigation = useNavigation()
-    return (<View style = {styles.window}>  
-            <View style={styles.textContainer}>
-                <Text style={styles.courseName}>RELUL 2024</Text>
-            </View>
-            <View style={styles.descriptionBoxContainer}>
-              <Text style={styles.personalTitle}>Descripcion</Text>
-              <View style={styles.descriptionBox}>
-                <Text style={styles.courseDescription}>Escuela de liderazgo para america edicion 2024. Se realizo en Pilar, asistieron +120 personas de distintos paises de latinoamerica buscando lograr una region mas solidaria y fraterna</Text>
-              </View>
-            </View>
-          <Text style={styles.personalTitle}>Participantes</Text>
-        <View style = {styles.listaParticipantes}>
-            <ParticipantsList></ParticipantsList>
-        </View>
+    useEffect(() => {
+        const fetchDetails = async () => {
+            if (!token || !courseId) return;
+            try {
+                const data = await getCourseById(courseId, token);
+                setCourse(data);
+            } catch (error) {
+                Alert.alert("Error", "No se pudo cargar la información del curso.");
+                router.back();
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDetails();
+    }, [courseId, token]);
+
+    const handleJoin = async () => {
+        if (!user?.id) return;
         
-        <TouchableOpacity style={styles.joinButtom} title="Unirse a curso"
-          onPress={() => navigation.navigate('Unirse')}>
-            <Text style={styles.title}>Unirse al curso</Text>
-          </TouchableOpacity>
-    </View>
-)
-};  
+        setJoining(true);
+        try {
+            // Enviamos el rol seleccionado al servicio
+            await joinCourse(user.id, courseId, selectedRole, token);
+            
+            Alert.alert(
+                "Solicitud Enviada", 
+                `Tu solicitud para unirte como "${selectedRole}" ha sido enviada.`,
+                [{ text: "Volver a Inicio", onPress: () => router.replace('/(tabs)/Home') }]
+            );
+        } catch (error) {
+            const msg = error.response?.status === 409 
+                ? "Ya tienes una solicitud pendiente o ya estás inscrito en este curso." 
+                : "Hubo un error al intentar unirse.";
+            Alert.alert("Aviso", msg);
+        } finally {
+            setJoining(false);
+        }
+    };
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#009AFF" style={styles.loader} />;
+    }
+
+    if (!course) return null;
+
+    return (
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+            {/* Header Visual */}
+            <View style={styles.headerCard}>
+                <View style={styles.iconContainer}>
+                    <MaterialCommunityIcons name="school" size={60} color="#009AFF" />
+                </View>
+                <Text style={styles.title}>{course.title}</Text>
+                <Text style={styles.statusBadge}>INSCRIPCIÓN ABIERTA</Text>
+            </View>
+
+            {/* Información del Curso */}
+            <View style={styles.infoBlock}>
+                <Text style={styles.sectionTitle}>Detalles</Text>
+                <Text style={styles.description}>{course.description || "Sin descripción disponible."}</Text>
+                
+                <View style={styles.row}>
+                    <MaterialCommunityIcons name="calendar" size={20} color="#666" />
+                    <Text style={styles.rowText}>
+                        Inicio: {new Date(course.startDate).toLocaleDateString()}
+                    </Text>
+                </View>
+                
+                <View style={styles.row}>
+                    <MaterialCommunityIcons name="map-marker" size={20} color="#666" />
+                    <Text style={styles.rowText}>{course.location}</Text>
+                </View>
+            </View>
+
+            {/* Selector de Rol */}
+            <View style={styles.roleBlock}>
+                <Text style={styles.sectionTitle}>¿Cómo quieres participar?</Text>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={selectedRole}
+                        onValueChange={(itemValue) => setSelectedRole(itemValue)}
+                        style={styles.picker}
+                        mode="dropdown" // Android: dropdown, iOS: wheel (default)
+                    >
+                        <Picker.Item label="Asistido" value="Asistido" />
+                        <Picker.Item label="Asistente de grupo" value="Asistente de grupo" />
+                        <Picker.Item label="Tallerista" value="Tallerista" />
+                        <Picker.Item label="Subcapitán" value="Subcapitan" />
+                        <Picker.Item label="Capitán" value="Capitan" />
+                    </Picker>
+                </View>
+            </View>
+
+            {/* Botón de Acción */}
+            <View style={styles.footer}>
+                <TouchableOpacity 
+                    style={[styles.joinButton, joining && styles.disabledButton]} 
+                    onPress={handleJoin}
+                    disabled={joining}
+                >
+                    {joining ? (
+                        <ActivityIndicator color="white" />
+                    ) : (
+                        <>
+                            <MaterialCommunityIcons name="account-plus" size={24} color="white" style={{marginRight: 10}} />
+                            <Text style={styles.joinButtonText}>Solicitar Unirse</Text>
+                        </>
+                    )}
+                </TouchableOpacity>
+            </View>
+        </ScrollView>
+    );
+};
 
 const styles = StyleSheet.create({
-    container:{
-        alignItems: 'center',
+    container: {
+        flex: 1,
+        backgroundColor: '#f0f2f5',
     },
-    imageContainer:{
-        marginTop:15,
-        marginLeft: 5
-    },textContainer:{
-        marginTop:20,
-        alignItems:'center'
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
     },
-    courseName:{
-        fontSize: 30,
-        fontWeight:'bold'   
-    },
-    personalTitle:{
-        textDecorationLine: 'underline',
-        fontSize:23,
-        marginLeft:15,
-        marginTop:30,
-    },
-    personalInfocontainer:{
-
-    },
-    personalInfo:{
-        fontSize:20,
-        marginTop:14,
-        marginLeft:10,
-        marginRight:10,
-        borderBottomColor:"black", 
-        borderBottomWidth:1, 
-    },
-    item: {
-        backgroundColor: '#ADD8E6',
-        borderBlockColor:"black",
-        borderWidth:2,
-        borderRadius:20,
-        marginTop:15,
-        marginLeft:10,
-        marginRight:10,
-        width: 110,
-        height:110,
-        alignItems:'center',
-      },
-      title: {
-        fontSize: 20,
-        textAlign:'center'
-      },
-      talk: {
-        backgroundColor: '#ADD8E6',
+    contentContainer: {
         padding: 20,
-        marginVertical: 8,
-        marginHorizontal: 16,
-        width:250,
-        marginLeft:40
-      },
-      image:{
-        width: 30,
-        height: 30,
-        borderRadius: 25,
     },
-    talkElement:{
-        flexDirection:'row',
-        alignItems:'center',
-        marginTop:20,
-        marginLeft:15,
+    headerCard: {
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 30,
+        alignItems: 'center',
+        marginBottom: 20,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
     },
-    imageContainer:{
-        alignItems:'center',
-        marginLeft:15
+    iconContainer: {
+        backgroundColor: '#e6f7ff',
+        padding: 20,
+        borderRadius: 50,
+        marginBottom: 15,
     },
-    memberImage:{
-      width:60,
-      height:60
+    title: {
+        fontSize: 26,
+        fontWeight: 'bold',
+        color: '#333',
+        textAlign: 'center',
+        marginBottom: 10,
     },
-    joinButtom:{
-      marginTop:40,
-      alignSelf:'center',
-      height:60,
-      width:250,
-      backgroundColor:"#8eb2c5",
-      justifyContent:'center',
-      borderRadius:10,
+    statusBadge: {
+        backgroundColor: '#E8F5E9',
+        color: '#2E7D32',
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 12,
+        fontSize: 12,
+        fontWeight: 'bold',
+        overflow: 'hidden',
     },
-    descriptionBox:{
-      height:140,
-      width:0.9*width,
-      backgroundColor:"lightgrey",
-      borderRadius:10,
-      marginLeft:10,
-
+    infoBlock: {
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 20,
+        marginBottom: 20, // Reducido para dar espacio al siguiente bloque
+        elevation: 2,
     },
-    courseDescription:{
-      fontSize:17,
-      marginLeft:5,
-      marginTop:8
+    roleBlock: {
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 20,
+        marginBottom: 30,
+        elevation: 2,
     },
-    descriptionBoxContainer:{
-      marginTop:15,
-      marginBottom:15
+    pickerContainer: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 10,
+        marginTop: 10,
+        backgroundColor: '#f9f9f9',
+        overflow: 'hidden', // Para que el picker respete el borde redondeado en Android
     },
-    listaParticipantes:{
-      marginTop:15,
-      marginBottom:15
-    }
+    picker: {
+        height: 50,
+        width: '100%',
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 10,
+    },
+    description: {
+        fontSize: 16,
+        color: '#555',
+        lineHeight: 24,
+        marginBottom: 20,
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    rowText: {
+        marginLeft: 10,
+        fontSize: 16,
+        color: '#444',
+    },
+    footer: {
+        marginTop: 10,
+        marginBottom: 40
+    },
+    joinButton: {
+        backgroundColor: '#009AFF',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 16,
+        borderRadius: 12,
+        elevation: 3,
+        shadowColor: "#009AFF",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+    },
+    disabledButton: {
+        backgroundColor: '#a0d9ff',
+    },
+    joinButtonText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
 });
+
 export default Course;

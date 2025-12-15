@@ -13,7 +13,7 @@ const router = Router();
 // Rutas para Cursos
 // GET /api/courses - Obtener todos los cursos
 // Puede ser público o requerir autenticación, dependiendo de tu lógica de negocio
-router.get('/', authenticateToken, authorizeRoles(['admin']), getAllCourses);  
+router.get('/', authenticateToken, authorizeRoles(['admin','user']), getAllCourses);  
 
 // GET /api/courses/:id - Obtener un curso por ID
 // Puede ser público o requerir autenticación

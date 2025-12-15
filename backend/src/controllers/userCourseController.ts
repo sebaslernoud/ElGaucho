@@ -66,7 +66,7 @@ export const createUserCourse = async (req: Request, res: Response) => {
 
  // Security check: A user can only register themselves for a course, unless they are an admin.
  // This assumes 'admin' role is available in req.user.role.
- if (userId !== authenticatedUserId && req.user?.role !== 'admin') {
+ if (userId !== authenticatedUserId && req.user?.role !== 'user') {
    return res.status(403).json({ message: 'Forbidden: You can only register yourself for a course unless you are an admin.' });
  }
 
