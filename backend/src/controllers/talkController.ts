@@ -15,8 +15,16 @@ export const getAllTalks = async (req: Request, res: Response) => {
 export const getTalkById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const talk = await prisma.talk.findUnique({ where: { id } });
-    if (!talk) return res.status(404).json({ message: 'Talk not found' });
+    const talk = await prisma.talk.findUnique({
+      where: { id },
+      include: {
+        speaker: true, // <--- ESTO ES LA CLAVE: Trae la info de la tabla Speaker
+      },
+    });
+
+    if (!talk) {
+      return res.status(404).json({ message: 'Talk not found' });
+    }
     res.status(200).json(talk);
   } catch (error: any) {
     res.status(500).json({ message: 'Error fetching talk', error: error.message });

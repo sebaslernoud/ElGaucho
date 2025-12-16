@@ -57,8 +57,32 @@ export const getAdminData = (req: Request, res: Response) => {
   res.status(200).json({ message: 'This is sensitive admin data!', user: req.user });
 };
 
-// Puedes añadir más funciones aquí, por ejemplo:
-// - Actualizar perfil de usuario (PUT /api/users/profile)
-// - Obtener todos los usuarios (GET /api/users) - solo para admins
-// - Obtener usuario por ID (GET /api/users/:id) - solo para admins
-// - Eliminar usuario (DELETE /api/users/:id) - solo para admins
+export const getUserById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      // Solo seleccionamos datos seguros/públicos
+      select: {
+        id: true,
+        name: true,
+        lastName: true,
+        email: true,
+        role: true,
+        profilePictureUrl: true,
+        countryOfBirth: true,
+        cityOfResidence: true,
+        university: true,
+        career: true, // Agregamos la carrera que pediste antes
+        dateOfBirth: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    res.status(200).json(user);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error fetching user', error: error.message });
+  }
+};

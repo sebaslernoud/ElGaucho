@@ -1,210 +1,266 @@
-import React, { useState } from 'react';
-import { View, Text,FlatList, TextInput, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-const { width, height } = Dimensions.get('window');
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity
+} from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSelector } from 'react-redux';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { getTalkById } from './services/talkService';
 
-const Stars = () => {
-    const talkers = [
-        { id: '1', value: 1},
-        { id: '2', value: 1},
-        { id: '3', value: 1},
-        { id: '4', value: 1},
-        { id: '5', value: 0},
-       // Agrega más participantes aquí según sea necesario
-    ];
+const Talk = () => {
+  const { talkId } = useLocalSearchParams();
+  const router = useRouter();
+  const token = useSelector(state => state.auth.token);
 
-    const renderItem = ({ item }) => {
-        if (item.value == 1){
-            return(
-                <View style = {styles.starContainer}>
-                    <Image style={styles.star} source={{uri: "data:image/png;base64,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"}} />
-                </View>
-            )
-        }else{
-            return(
-                <View style = {styles.starContainer}>
-                    
-                </View>
-            );
+  const [talk, setTalk] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTalkDetails = async () => {
+        if (!talkId || !token) return;
+        try {
+            const data = await getTalkById(talkId, token);
+            setTalk(data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
-        };
-
-
-    return (
-        <FlatList style = {styles.stars}
-          data={talkers}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          horizontal
-        />
-      );
-}
-
-
-const TalkersList = () => {
-  const navigation = useNavigation();
-    const talkers = [
-        { id: '1', name: 'Delfina' },
-        { id: '2', name: 'Santiago'},
-       // Agrega más participantes aquí según sea necesario
-    ];
-    const renderItem = ({ item }) => {
-    return(
-      <TouchableOpacity style={styles.item} title="Ir a Perfil"
-      onPress={() => navigation.navigate('Perfil')}>
-        <Image style={styles.talkerImage} source={{uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAChklEQVR4nO2ZTYiNURjHfwxmyGCBzIJ8jFJiw4Zu2SBcFqyEhSIfGxGNFYmJWEmp2SkfxVgJKZJMo2ZEUxLJQiNfYchsyMc908lfvd3c+973Pe91jnp/9azuOf/+zz1fzzkv5OT8VzQABWAf0AF0AheBk8B6YAyB0wi0AW8BUyXeAUUCZQbwOGL2IXBKo7JBI7Ef6Nbv34EzwDICYhLQL4M9wIKY9gfLRugqMI4AuCRDdzS94hgGTAe2Aa/V9xqemQmUgK9Aa4r+04ABJbMCj+ySifMOGocy0HDmikxsdNCYL40neKRXJuIWeDVGAT+BHzqDvPBciaRZH1HsdmyUlBeeysAsBw07Cr8U3kakS4ksctCYKo03eKRTJtY5aCyVxl08ckAmDjtotEujHY8UZeKGg8Y9aSzHI2tlYkClR1ImRnasAh7pkYmdKfuPAI5I4wIe6c/gHFksjS48cl0mNjlo7JDGWTyyXSZeAHtSFowvM6jXnBkZKRyTFn12c/isa8Bln6f6H4YDgyr8mhP0a9Uf8IyAuJlirbSpj727B8NWmXpQ43nSqHVl+6wiIEZHFu3xGtqfU9s+Tc2gWJ2gijUZXMjqRkuKRIKkJU8kMIoakW96fazElMjUWkhgrAQ+RgzaHWw3MBcYqyfReX955H4FLCEACnq7LcW8wFcL2/cWsCblncbpzNgCPHIwXyn6gM1AUz0TmAwcBT7UIYHyeK87vL1BZkaD5vbgP0jAlMUXYG8Wp/8EfS4wnuM2MD5tEs0qAk0gcV87YGI6AjBvyuJ00iTmOG6p9YoSMDtJIicCMG0qxLE071UhRneSRD4FYNhUCPuqWRNNAZg1MVHL1+OcnBx+MwTQ0ifIg+pOMwAAAABJRU5ErkJggg=="}} />
-        <Text style={styles.talkerName}>{item.name}</Text>
-      </TouchableOpacity>
-      )
     };
-  
+    fetchTalkDetails();
+  }, [talkId, token]);
+
+  if (loading) {
     return (
-      <FlatList style = {styles.talkersList}
-        data={talkers}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        numColumns={3}
-      />
+      <View style={[styles.container, styles.center]}>
+        <ActivityIndicator size="large" color="#009AFF" />
+      </View>
     );
-  };
+  }
 
-const Talk = (props) => {
-
+  if (!talk) {
     return (
-        <View style = {styles.container}>
-            <View style={styles.titleContainer}>
-                <Text style={styles.title}>Liderazgo</Text>
+      <View style={[styles.container, styles.center]}>
+        <Text style={styles.errorText}>No se encontró la charla.</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      {/* Botón Volver flotante */}
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <MaterialCommunityIcons name="arrow-left" size={28} color="#333" />
+      </TouchableOpacity>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        
+        {/* Encabezado */}
+        <View style={styles.headerCard}>
+            <View style={styles.iconContainer}>
+                <MaterialCommunityIcons name="microphone-variant" size={40} color="#009AFF" />
             </View>
-            <View style={styles.summaryContainer}>
-                <Text style={styles.summaryTitle}>Resumen</Text>
-                <View style={styles.summaryTextContainer}>
-                    <Text style={styles.summary}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel egestas dolor, nec dignissim metus. Donec augue elit, rhoncus ac sodales id, porttitor vitae est. Donec laoreet rutrum libero sed pharetra.
-                    Donec vel egestas dolor, nec dignissim metus. Donec augue elit, rhoncus ac sodales id, porttitor vitae est. Donec laoreet rutrum libero sed pharetra. Duis a arcu convallis, gravida purus eget, mollis diam.</Text>
-                </View>
-                <View>
-                    <Text></Text>
-                </View>
-            </View>
-            <View style = {styles.talkersContainer}>
-                <Text style={styles.talkersTitle}>Charlistas</Text>
-                <TalkersList></TalkersList>
-            </View>
-            <View style={styles.starsContainer}>
-                <Text style={styles.starsTitle}>Puntuacion</Text>
-                <Stars></Stars>
-                <TouchableOpacity style={styles.rateBottom}>
-                    <Text style={styles.rateText}>Puntuar</Text>
-                </TouchableOpacity>
+            <Text style={styles.title}>{talk.title}</Text>
+            <View style={styles.roomBadge}>
+                <MaterialCommunityIcons name="map-marker" size={16} color="#666" />
+                <Text style={styles.roomText}>Aula: {talk.room}</Text>
             </View>
         </View>
-    )
-}
 
+        {/* Info del Speaker (MODIFICADO) */}
+        <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Disertante</Text>
+            {/* Se eliminó el avatar y se muestra speakerName y expertise */}
+            <View style={styles.speakerCard}>
+                <View>
+                    <Text style={styles.speakerName}>
+                        {talk.speaker?.speakerName || 'A confirmar'}
+                    </Text>
+                    <Text style={styles.speakerExpertise}>
+                        {talk.speaker?.expertise || 'Speaker Invitado'}
+                    </Text>
+                </View>
+            </View>
+        </View>
+
+        {/* Horario y Descripción */}
+        <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Detalles</Text>
+            
+            <View style={styles.infoRow}>
+                <MaterialCommunityIcons name="clock-outline" size={22} color="#009AFF" style={styles.infoIcon} />
+                <View>
+                    <Text style={styles.infoLabel}>Horario</Text>
+                    <Text style={styles.infoValue}>
+                        {new Date(talk.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} 
+                        {' - '}
+                        {new Date(talk.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </Text>
+                </View>
+            </View>
+
+            <View style={styles.divider} />
+
+            <Text style={styles.descriptionLabel}>Descripción</Text>
+            <Text style={styles.description}>
+                {talk.description || "Sin descripción disponible para esta charla."}
+            </Text>
+        </View>
+
+      </ScrollView>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    container:{
-
-    },
-    titleContainer:{
-        alignItems:'center',
-        marginTop:20
-    },
-    title:{
-        fontSize:30,
-        fontWeight:'bold'
-    },
-    summaryContainer:{
-        marginTop:30,
-        marginLeft:15,
-        marginRight:15
-    },
-    summaryTitle:{
-        textDecorationLine:'underline',
-        fontSize:20,
-    },
-    summaryTextContainer:{
-        borderBlockColor: "black",
-        borderWidth:1,
-        borderRadius:10,
-        marginTop:10,
-        backgroundColor:"#f0ffff",
-
-    },
-    summary:{
-        fontSize:14,
-        padding:15
-    },
-    talkersContainer:{
-        marginTop:10,
-        marginLeft:15
-    },
-    talkersTitle:{
-        textDecorationLine:'underline',
-        fontSize:20,
-    },
-    talkersList:{
-
-    },
-    item: {
-        backgroundColor: '#f0ffff',
-        borderBlockColor:"black",
-        borderWidth:2,
-        borderRadius:20,
-        marginTop:15,
-        marginLeft:10,
-        marginRight:10,
-        width: 110,
-        height:110,
-        alignItems:'center',
-      },
-      talkerImage:{
-        width:60,
-        height:60,
-        marginTop:5
-      },
-      talkerName:{
-        fontSize: 20,
-        textAlign:'center'
-      },
-      stars:{
-        marginTop:15,
-
-      },
-      starsContainer:{
-        marginTop:20,
-        marginLeft:15
-      },
-      starsTitle:{
-        textDecorationLine:'underline',
-        fontSize:20,    
-      },
-      starContainer:{
-        width:50,
-        height:50,
-      },
-      star:{
-        width:40,
-        height:40,
-      },
-      rateBottom :{
-        backgroundColor: '#009AFF',
-        borderColor:'grey',
-        borderWidth:3,
-        height:60,
-        width:width - width/15 -25,
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginTop:20,
-        marginLeft:15,
-        textAlign:'center',
-      },
-      rateText:{
-        fontSize:25,
-        fontWeight:'bold'
-      }
-
-
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f7fa',
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollContent: {
+    paddingTop: 80,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 10,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 8,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  headerCard: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 25,
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  iconContainer: {
+    backgroundColor: '#e6f7ff',
+    padding: 15,
+    borderRadius: 50,
+    marginBottom: 15,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  roomBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+  },
+  roomText: {
+    marginLeft: 5,
+    color: '#555',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  sectionContainer: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  speakerCard: {
+    // Ya no necesita flexDirection: 'row' si no hay imagen al lado
+    backgroundColor: '#f9f9f9',
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  speakerName: {
+    fontSize: 18, // Aumenté un poco el tamaño
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4, // Espacio para el expertise
+  },
+  speakerExpertise: {
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic', // Estilo itálico para diferenciarlo
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  infoIcon: {
+    marginRight: 15,
+    backgroundColor: '#f0f9ff',
+    padding: 8,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: '#999',
+  },
+  infoValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#eee',
+    marginVertical: 15,
+  },
+  descriptionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  description: {
+    fontSize: 15,
+    color: '#555',
+    lineHeight: 24,
+  },
 });
 
 export default Talk;

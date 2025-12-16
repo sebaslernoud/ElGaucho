@@ -1,95 +1,195 @@
-import React, { useState } from 'react';
-import { View, Text, Flexbox, TextInput,ScrollView, Button, StyleSheet, Dimensions, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-const { width, height } = Dimensions.get('window');
+import React, { useEffect, useState } from 'react';
+import { 
+    View, 
+    Text, 
+    ScrollView, 
+    StyleSheet, 
+    TouchableOpacity, 
+    Image, 
+    ActivityIndicator 
+} from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useSelector } from 'react-redux';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { getCourseById } from './services/courseService'; //
 
-function Section () {
-    const navigation = useNavigation();
-    return(
-        <View style={styles.boxMembers}>
-            <TouchableOpacity style = {styles.memberButton} title="Ir a Perfil"
-        onPress={() => navigation.navigate('Perfil')}>
-                <Image style={styles.memberImage} source={{uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAChklEQVR4nO2ZTYiNURjHfwxmyGCBzIJ8jFJiw4Zu2SBcFqyEhSIfGxGNFYmJWEmp2SkfxVgJKZJMo2ZEUxLJQiNfYchsyMc908lfvd3c+973Pe91jnp/9azuOf/+zz1fzzkv5OT8VzQABWAf0AF0AheBk8B6YAyB0wi0AW8BUyXeAUUCZQbwOGL2IXBKo7JBI7Ef6Nbv34EzwDICYhLQL4M9wIKY9gfLRugqMI4AuCRDdzS94hgGTAe2Aa/V9xqemQmUgK9Aa4r+04ABJbMCj+ySifMOGocy0HDmikxsdNCYL40neKRXJuIWeDVGAT+BHzqDvPBciaRZH1HsdmyUlBeeysAsBw07Cr8U3kakS4ksctCYKo03eKRTJtY5aCyVxl08ckAmDjtotEujHY8UZeKGg8Y9aSzHI2tlYkClR1ImRnasAh7pkYmdKfuPAI5I4wIe6c/gHFksjS48cl0mNjlo7JDGWTyyXSZeAHtSFowvM6jXnBkZKRyTFn12c/isa8Bln6f6H4YDgyr8mhP0a9Uf8IyAuJlirbSpj727B8NWmXpQ43nSqHVl+6wiIEZHFu3xGtqfU9s+Tc2gWJ2gijUZXMjqRkuKRIKkJU8kMIoakW96fazElMjUWkhgrAQ+RgzaHWw3MBcYqyfReX955H4FLCEACnq7LcW8wFcL2/cWsCblncbpzNgCPHIwXyn6gM1AUz0TmAwcBT7UIYHyeK87vL1BZkaD5vbgP0jAlMUXYG8Wp/8EfS4wnuM2MD5tEs0qAk0gcV87YGI6AjBvyuJ00iTmOG6p9YoSMDtJIicCMG0qxLE071UhRneSRD4FYNhUCPuqWRNNAZg1MVHL1+OcnBx+MwTQ0ifIg+pOMwAAAABJRU5ErkJggg=="}} />
-                <Text style={styles.memberText}>Pedro Juanes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style = {styles.memberButton} title="Ir a Perfil"
-        onPress={() => navigation.navigate('Perfil')}>
-                <Image style={styles.memberImage} source={{uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAChklEQVR4nO2ZTYiNURjHfwxmyGCBzIJ8jFJiw4Zu2SBcFqyEhSIfGxGNFYmJWEmp2SkfxVgJKZJMo2ZEUxLJQiNfYchsyMc908lfvd3c+973Pe91jnp/9azuOf/+zz1fzzkv5OT8VzQABWAf0AF0AheBk8B6YAyB0wi0AW8BUyXeAUUCZQbwOGL2IXBKo7JBI7Ef6Nbv34EzwDICYhLQL4M9wIKY9gfLRugqMI4AuCRDdzS94hgGTAe2Aa/V9xqemQmUgK9Aa4r+04ABJbMCj+ySifMOGocy0HDmikxsdNCYL40neKRXJuIWeDVGAT+BHzqDvPBciaRZH1HsdmyUlBeeysAsBw07Cr8U3kakS4ksctCYKo03eKRTJtY5aCyVxl08ckAmDjtotEujHY8UZeKGg8Y9aSzHI2tlYkClR1ImRnasAh7pkYmdKfuPAI5I4wIe6c/gHFksjS48cl0mNjlo7JDGWTyyXSZeAHtSFowvM6jXnBkZKRyTFn12c/isa8Bln6f6H4YDgyr8mhP0a9Uf8IyAuJlirbSpj727B8NWmXpQ43nSqHVl+6wiIEZHFu3xGtqfU9s+Tc2gWJ2gijUZXMjqRkuKRIKkJU8kMIoakW96fazElMjUWkhgrAQ+RgzaHWw3MBcYqyfReX955H4FLCEACnq7LcW8wFcL2/cWsCblncbpzNgCPHIwXyn6gM1AUz0TmAwcBT7UIYHyeK87vL1BZkaD5vbgP0jAlMUXYG8Wp/8EfS4wnuM2MD5tEs0qAk0gcV87YGI6AjBvyuJ00iTmOG6p9YoSMDtJIicCMG0qxLE071UhRneSRD4FYNhUCPuqWRNNAZg1MVHL1+OcnBx+MwTQ0ifIg+pOMwAAAABJRU5ErkJggg=="}} />
-                <Text style={styles.memberText}>Simon Maluma</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style = {styles.memberButton} title="Ir a Perfil"
-        onPress={() => navigation.navigate('Perfil')}>
-                <Image style={styles.memberImage} source={{uri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAChklEQVR4nO2ZTYiNURjHfwxmyGCBzIJ8jFJiw4Zu2SBcFqyEhSIfGxGNFYmJWEmp2SkfxVgJKZJMo2ZEUxLJQiNfYchsyMc908lfvd3c+973Pe91jnp/9azuOf/+zz1fzzkv5OT8VzQABWAf0AF0AheBk8B6YAyB0wi0AW8BUyXeAUUCZQbwOGL2IXBKo7JBI7Ef6Nbv34EzwDICYhLQL4M9wIKY9gfLRugqMI4AuCRDdzS94hgGTAe2Aa/V9xqemQmUgK9Aa4r+04ABJbMCj+ySifMOGocy0HDmikxsdNCYL40neKRXJuIWeDVGAT+BHzqDvPBciaRZH1HsdmyUlBeeysAsBw07Cr8U3kakS4ksctCYKo03eKRTJtY5aCyVxl08ckAmDjtotEujHY8UZeKGg8Y9aSzHI2tlYkClR1ImRnasAh7pkYmdKfuPAI5I4wIe6c/gHFksjS48cl0mNjlo7JDGWTyyXSZeAHtSFowvM6jXnBkZKRyTFn12c/isa8Bln6f6H4YDgyr8mhP0a9Uf8IyAuJlirbSpj727B8NWmXpQ43nSqHVl+6wiIEZHFu3xGtqfU9s+Tc2gWJ2gijUZXMjqRkuKRIKkJU8kMIoakW96fazElMjUWkhgrAQ+RgzaHWw3MBcYqyfReX955H4FLCEACnq7LcW8wFcL2/cWsCblncbpzNgCPHIwXyn6gM1AUz0TmAwcBT7UIYHyeK87vL1BZkaD5vbgP0jAlMUXYG8Wp/8EfS4wnuM2MD5tEs0qAk0gcV87YGI6AjBvyuJ00iTmOG6p9YoSMDtJIicCMG0qxLE071UhRneSRD4FYNhUCPuqWRNNAZg1MVHL1+OcnBx+MwTQ0ifIg+pOMwAAAABJRU5ErkJggg=="}} />
-                <Text style={styles.memberText}>Pucho Suarez</Text>
-            </TouchableOpacity>
-        </View>
-    );
-};
+const Members = () => {
+    const { courseId } = useLocalSearchParams();
+    const router = useRouter();
+    const token = useSelector(state => state.auth.token);
+    
+    const [loading, setLoading] = useState(true);
+    const [members, setMembers] = useState([]);
 
-function Members() {
+    useEffect(() => {
+        const fetchMembers = async () => {
+            if (!courseId || !token) return;
+            try {
+                // Obtenemos los participantes del curso
+                const courseData = await getCourseById(courseId, token);
+                setMembers(courseData.userCourses || []);
+            } catch (error) {
+                console.error("Error fetching members:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchMembers();
+    }, [courseId, token]);
+
+    if (loading) {
+        return (
+            <View style={styles.loaderContainer}>
+                <ActivityIndicator size="large" color="#009AFF" />
+            </View>
+        );
+    }
+
+    // Función auxiliar para filtrar miembros por rol
+    const getMembersByRole = (role) => members.filter(m => m.roleInCourse === role);
+
+    // Componente para renderizar una sección de roles
+    const RenderSection = ({ title, role }) => {
+        const roleMembers = getMembersByRole(role);
+        
+        // Si no hay miembros con ese rol, no mostramos la sección
+        if (roleMembers.length === 0) return null;
+
+        return (
+            <View style={styles.sectionContainer}>
+                <Text style={styles.roleTitle}>{title}</Text>
+                <View style={styles.gridContainer}>
+                    {roleMembers.map((item) => (
+                        <TouchableOpacity 
+                            key={item.userId}
+                            style={styles.memberCard}
+                            onPress={() => router.push({ 
+                                pathname: '/src/UserProfile', 
+                                params: { userId: item.userId } 
+                            })}
+                        >
+                            <Image 
+                                style={styles.avatar} 
+                                source={{ 
+                                    uri: item.user.profilePictureUrl || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" 
+                                }} 
+                            />
+                            <Text style={styles.memberName} numberOfLines={2}>
+                                {item.user.name} {item.user.lastName}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            </View>
+        );
+    };
+
     return (
-        <View style = {styles.container}>
-            <Text style = {styles.titleMembers}>Participantes</Text>
-            <ScrollView style={styles.wrappedMembers}>
-                <Text style={styles.rolesText}>Capitanes</Text>
-                <Section />
-                <Text style={styles.rolesText}>Subcapitanes</Text>
-                <Section />
-                <Text style={styles.rolesText}>Talleristas</Text>
-                <Section />
-                <Text style={styles.rolesText}>Asistentes de grupo</Text>
-                <Section />
-                <Text style={styles.rolesText}>Asistidos</Text>
-                <Section />
+        <View style={styles.mainContainer}>
+            {/* Header con botón de volver */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                    <MaterialCommunityIcons name="arrow-left" size={28} color="#333" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Participantes</Text>
+            </View>
+
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                {/* Renderizamos las secciones en el orden deseado */}
+                <RenderSection title="Capitanes" role="Capitan" />
+                <RenderSection title="Subcapitanes" role="Subcapitan" />
+                <RenderSection title="Talleristas" role="Tallerista" />
+                <RenderSection title="Asistentes de Grupo" role="Asistente de grupo" />
+                <RenderSection title="Asistidos" role="Asistido" />
+                
+                {/* Sección genérica para roles no clasificados o admin */}
+                <RenderSection title="Organizadores" role="organizer" />
+                <RenderSection title="Sin Rol Asignado" role="participant" />
+                <RenderSection title="Pendientes" role="pending" />
             </ScrollView>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container :{
-
+    mainContainer: {
+        flex: 1,
+        backgroundColor: '#f5f7fa',
     },
-    titleMembers:{
-        marginTop:20,
-        fontSize:28,
-        alignSelf:'center',
-    },
-    rolesText:{
-        fontWeight:'bold',
-        marginTop:10,
-        fontSize: 20,
-        marginLeft:7
-    },
-    wrappedMembers: {
-        marginTop:15,
-        marginBottom:60
-    },
-    boxMembers:{
-        flexWrap:'wrap',
-        flexDirection:'row',
+    loaderContainer: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
-        width: '100%'
     },
-    memberButton:{
-       
-        borderBlockColor:"black",
-        borderWidth:2,
-        borderRadius:20,
-        marginTop:15,
-        marginLeft:10,
-        marginRight:10,
-        width: 110,
-        height:110,
-        alignItems:'center'
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingTop: 50,
+        paddingBottom: 15,
+        paddingHorizontal: 20,
+        backgroundColor: 'white',
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
     },
-    memberImage:{
-        width:70,
-        height:70
+    backButton: {
+        marginRight: 15,
     },
-    memberText:{
-        fontSize:13
-    }
+    headerTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    scrollContent: {
+        padding: 20,
+        paddingBottom: 40,
+    },
+    sectionContainer: {
+        marginBottom: 25,
+    },
+    roleTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#009AFF',
+        marginBottom: 12,
+        marginLeft: 5,
+        borderBottomWidth: 2,
+        borderBottomColor: '#e0e0e0',
+        paddingBottom: 5,
+    },
+    gridContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+    },
+    memberCard: {
+        backgroundColor: 'white',
+        borderRadius: 15,
+        width: '30%', // Aproximadamente 3 columnas
+        margin: '1.5%',
+        padding: 10,
+        alignItems: 'center',
+        elevation: 2,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+    },
+    avatar: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        marginBottom: 8,
+        backgroundColor: '#eee',
+    },
+    memberName: {
+        fontSize: 12,
+        textAlign: 'center',
+        color: '#333',
+        fontWeight: '500',
+    },
 });
 
 export default Members;

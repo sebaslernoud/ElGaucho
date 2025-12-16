@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, StyleSheet, Text, View, ScrollView } from 'react-native';
+import { ActivityIndicator, Dimensions, FlatList, StyleSheet, Text, View, ScrollView,TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -10,7 +10,7 @@ const CourseIn = () => {
     const { courseId } = useLocalSearchParams();
     const authState = useSelector(state => state.auth);
     const token = authState?.token;
-
+    const router = useRouter();
     const [course, setCourse] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -35,7 +35,13 @@ const CourseIn = () => {
 
     // Renderizador de Charlas
     const renderTalkItem = ({ item }) => (
-        <View style={styles.cardItem}>
+        <TouchableOpacity 
+            style={styles.cardItem}
+            onPress={() => router.push({
+                pathname: '/src/Talk', // Navegar a la pantalla Talk
+                params: { talkId: item.id } // Pasamos el ID de la charla
+            })}
+        >
             <View style={styles.timeBox}>
                 <Text style={styles.timeText}>
                     {new Date(item.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -49,24 +55,34 @@ const CourseIn = () => {
                 </Text>
                 <Text style={styles.roomText}>Aula: {item.room}</Text>
             </View>
-        </View>
+            {/* Flechita indicando que es clickeable */}
+            <MaterialCommunityIcons name="chevron-right" size={24} color="#ddd" />
+        </TouchableOpacity>
     );
 
     // Renderizador de Miembros
     const renderMemberItem = ({ item }) => (
-        <View style={styles.memberCard}>
+        <TouchableOpacity 
+            style={styles.memberCard}
+            onPress={() => router.push({
+                pathname: '/src/UserProfile', // Navegamos a la nueva pantalla
+                params: { userId: item.user.id } // Pasamos el ID del usuario
+            })}
+        >
             <View style={styles.avatar}>
                 <Text style={styles.avatarText}>
                     {item.user.name?.charAt(0).toUpperCase()}{item.user.lastName?.charAt(0).toUpperCase()}
                 </Text>
             </View>
-            <View>
+            <View style={{flex: 1}}>
                 <Text style={styles.memberName}>{item.user.name} {item.user.lastName}</Text>
                 <Text style={styles.memberRole}>
-                    {item.roleInCourse === 'admin' || item.roleInCourse === 'organizer' ? 'Organizador' : 'Participante'}
+                    {item.roleInCourse === 'admin' || item.roleInCourse === 'organizer' ? 'Organizador' : item.roleInCourse || 'Participante'}
                 </Text>
             </View>
-        </View>
+            {/* Indicador visual de que es clickeable */}
+            <MaterialCommunityIcons name="chevron-right" size={24} color="#ddd" />
+        </TouchableOpacity>
     );
 
     return (
@@ -99,7 +115,7 @@ const CourseIn = () => {
 
             {/* Cronograma / Charlas */}
             <View style={styles.sectionBlock}>
-                <Text style={styles.sectionTitle}>Cronograma</Text>
+                <Text style={styles.sectionTitle}>Charlas</Text>
                 {course.talks && course.talks.length > 0 ? (
                     <FlatList
                         data={course.talks}
@@ -114,12 +130,23 @@ const CourseIn = () => {
 
             {/* Sección Miembros del Curso */}
             <View style={styles.sectionBlock}>
-                <Text style={styles.sectionTitle}>Participantes ({course.userCourses?.length || 0})</Text>
+                {/* Título clickeable para ir a la vista completa */}
+                <TouchableOpacity 
+                    style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15}}
+                    onPress={() => router.push({ pathname: '/src/Members', params: { courseId: course.id } })}
+                >
+                    <Text style={styles.sectionTitle}>Participantes ({course.userCourses?.length || 0})</Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={{color: '#009AFF', fontSize: 14, marginRight: 5}}>Ver todos</Text>
+                        <MaterialCommunityIcons name="chevron-right" size={24} color="#009AFF" />
+                    </View>
+                </TouchableOpacity>
+
                 {course.userCourses && course.userCourses.length > 0 ? (
                     <FlatList
-                        data={course.userCourses}
+                        data={course.userCourses.slice(0, 3)} // Mostramos solo los primeros 3 como vista previa
                         renderItem={renderMemberItem}
-                        keyExtractor={item => item.userId + item.courseId} // Clave única compuesta
+                        keyExtractor={item => item.userId + item.courseId}
                         scrollEnabled={false}
                         contentContainerStyle={styles.membersList}
                     />
