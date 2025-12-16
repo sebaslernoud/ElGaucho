@@ -52,12 +52,16 @@ export const getUserCoursesByStatus = async (status: string, token: string) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
-  } catch (error) {
-    console.error(`Error fetching user courses with status ${status}:`, error);
-    // Si da error 404 (no hay cursos), devolvemos array vacío para no romper el front
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
+  } catch (error: any) {
+    // Solución Robusta:
+    // Verificamos directamente si hay una respuesta y si el status es 404
+    if (error.response && error.response.status === 404) {
+        // No es un error crítico, simplemente no hay datos. Devolvemos array vacío.
         return [];
     }
+
+    // Si es otro tipo de error (500, red, etc.), lo mostramos y lo lanzamos
+    console.error(`Error fetching user courses with status ${status}:`, error);
     throw error;
   }
 };
