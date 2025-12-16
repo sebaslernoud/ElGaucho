@@ -11,7 +11,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { getCourseById } from './services/courseService'; //
+import { getCourseById } from './services/courseService'; 
 
 const Members = () => {
     const { courseId } = useLocalSearchParams();
@@ -27,7 +27,11 @@ const Members = () => {
             try {
                 // Obtenemos los participantes del curso
                 const courseData = await getCourseById(courseId, token);
-                setMembers(courseData.userCourses || []);
+                
+                // --- CAMBIO PRINCIPAL: Filtrar solo miembros con status 'accepted' ---
+                const acceptedMembers = (courseData.userCourses || []).filter(m => m.status === 'accepted');
+                setMembers(acceptedMembers);
+                
             } catch (error) {
                 console.error("Error fetching members:", error);
             } finally {
@@ -101,11 +105,7 @@ const Members = () => {
                 <RenderSection title="Talleristas" role="Tallerista" />
                 <RenderSection title="Asistentes de Grupo" role="Asistente de grupo" />
                 <RenderSection title="Asistidos" role="Asistido" />
-                
-                {/* Sección genérica para roles no clasificados o admin */}
-                <RenderSection title="Organizadores" role="organizer" />
-                <RenderSection title="Sin Rol Asignado" role="participant" />
-                <RenderSection title="Pendientes" role="pending" />
+
             </ScrollView>
         </View>
     );
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     memberCard: {
         backgroundColor: 'white',
         borderRadius: 15,
-        width: '30%', // Aproximadamente 3 columnas
+        width: '30%', 
         margin: '1.5%',
         padding: 10,
         alignItems: 'center',

@@ -64,6 +64,11 @@ const Home = () => {
       }));
       setMyAcceptedCourses(formattedAccepted);
 
+      const acceptedIds = new Set(formattedAccepted.map(c => c.id));
+      const notEnrolledCourses = formattedAll.filter(c => !acceptedIds.has(c.id));
+      
+      setAllCoursesList(notEnrolledCourses);
+
     } catch (error) {
       console.error("Error fetching home data:", error);
     } finally {

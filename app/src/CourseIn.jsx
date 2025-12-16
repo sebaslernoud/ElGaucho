@@ -20,6 +20,9 @@ const CourseIn = () => {
             try {
                 // getCourseById trae 'talks' y 'userCourses' (con 'user')
                 const data = await getCourseById(courseId, token);
+                if (data.userCourses) {
+                    data.userCourses = data.userCourses.filter(participant => participant.status === 'accepted');
+                }
                 setCourse(data);
             } catch (error) {
                 console.error(error);
