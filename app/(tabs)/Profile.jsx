@@ -108,9 +108,6 @@ const Profile = () => {
                     uri: user?.profilePictureUrl || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
                     }}
                 />
-                <TouchableOpacity style={styles.editIcon}>
-                    <MaterialCommunityIcons name="pencil" size={16} color="white" />
-                </TouchableOpacity>
             </View>
             
             <View style={styles.headerText}>
