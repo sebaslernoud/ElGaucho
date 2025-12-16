@@ -10,29 +10,25 @@ import {
   FlatList
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { useFocusEffect, useRouter } from 'expo-router'; // <--- Importamos useRouter
+import { useFocusEffect, useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { logout } from '../../redux/slices/authSlice';
-// Importamos el servicio para obtener cursos del usuario
 import { getUserCoursesByStatus } from '../src/services/userCourseService';
 
 const { width } = Dimensions.get('window');
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const router = useRouter(); // <--- Inicializamos el router
+  const router = useRouter();
   const { user, isAuthenticated, isLoading, token } = useSelector((state) => state.auth);
 
-  // Estados para el historial de cursos
   const [historyCourses, setHistoryCourses] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
-  // Función para obtener cursos aceptados
   const fetchHistory = async () => {
     if (!token) return;
     setLoadingHistory(true);
     try {
-        // Pedimos al backend solo los cursos donde el usuario ha sido aceptado
         const data = await getUserCoursesByStatus('accepted', token);
         setHistoryCourses(data);
     } catch (error) {
@@ -42,7 +38,6 @@ const Profile = () => {
     }
   };
 
-  // Recargar historial cada vez que se entra al perfil
   useFocusEffect(
     useCallback(() => {
         fetchHistory();
@@ -72,13 +67,12 @@ const Profile = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  // Renderizado de cada tarjeta de curso (AHORA CON NAVEGACIÓN)
   const renderCourseItem = ({ item }) => (
     <TouchableOpacity 
         style={styles.courseCard}
         onPress={() => router.push({
-            pathname: '/src/CourseIn', // Ruta a la vista de curso inscrito
-            params: { courseId: item.course.id } // Pasamos el ID
+            pathname: '/src/CourseIn',
+            params: { courseId: item.course.id }
         })}
     >
         <View style={styles.courseIconContainer}>
@@ -151,6 +145,18 @@ const Profile = () => {
             </View>
 
             <View style={styles.divider} />
+
+            {/* --- SECCIÓN NUEVA: CARRERA --- */}
+            <View style={styles.infoRow}>
+                <MaterialCommunityIcons name="book-open-variant" size={20} color="#009AFF" style={styles.icon} />
+                <View>
+                    <Text style={styles.label}>Carrera</Text>
+                    <Text style={styles.value}>{user?.career || 'No especificada'}</Text>
+                </View>
+            </View>
+
+            <View style={styles.divider} />
+            {/* ------------------------------- */}
 
             <View style={styles.infoRow}>
                 <MaterialCommunityIcons name="cake-variant" size={20} color="#009AFF" style={styles.icon} />
