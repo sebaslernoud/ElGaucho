@@ -7,7 +7,7 @@ import { getCourseById } from '../../src/services/courseService';
 const { width } = Dimensions.get('window');
 
 const CourseAdmin = () => {
-    const { courseId } = useLocalSearchParams(); // Recibimos el ID desde la navegación
+    const { courseId } = useLocalSearchParams(); 
     const router = useRouter();
     const authState = useSelector(state => state.auth);
     const token = authState?.token;
@@ -85,9 +85,8 @@ const CourseAdmin = () => {
                 <View style={styles.sectionBlock}>
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>Charlas </Text>
-                        {/* Botón para crear charla (opcional, redirige a CreateTalk) */}
                         <TouchableOpacity 
-                            onPress={() => router.push({ pathname: '/components/CreateTalk', params: { courseId: course.id } })}
+                            onPress={() => router.push({ pathname: 'components/CreateTalk', params: { courseId: course.id } })}
                         >
                             <Text style={styles.addButton}>+ Agregar</Text>
                         </TouchableOpacity>
@@ -98,7 +97,7 @@ const CourseAdmin = () => {
                             data={course.talks}
                             renderItem={renderTalkItem}
                             keyExtractor={item => item.id}
-                            scrollEnabled={false} // Usamos el scroll del padre
+                            scrollEnabled={false} 
                         />
                     ) : (
                         <Text style={styles.emptyText}>No hay charlas programadas.</Text>
@@ -109,7 +108,6 @@ const CourseAdmin = () => {
                 <View style={styles.sectionBlock}>
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>Participantes</Text>
-                    
                     </View>
 
                     {course.userCourses && course.userCourses.length > 0 ? (
@@ -132,129 +130,147 @@ const CourseAdmin = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f2f4f7', // Un gris muy suave para el fondo
     },
     loader: {
         flex: 1,
         justifyContent: 'center',
     },
     scrollContent: {
-        padding: 15,
-        paddingBottom: 40
+        paddingVertical: 30, // Más padding vertical global
+        alignItems: 'center', // [CENTRADO] Alinea los bloques al centro horizontalmente
+        paddingBottom: 50
     },
     headerBlock: {
         backgroundColor: 'white',
-        borderRadius: 12,
-        padding: 20,
-        marginBottom: 20,
+        borderRadius: 16, // Bordes más redondeados
+        padding: 20, // [PADDING AUMENTADO]
+        marginTop: 10,
+        marginBottom: 25,
+        width: width * 0.9, // [ANCHO CONTROLADO] Ocupa el 90% del ancho
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 4,
     },
     courseTitle: {
-        fontSize: 26,
+        fontSize: 22, // [LETRA MAS CHICA] (Antes 26)
         fontWeight: 'bold',
-        color: '#333',
+        color: '#2d3436',
         marginBottom: 5,
+        textAlign: 'center', // Título centrado
     },
     courseStatus: {
-        fontSize: 14,
+        fontSize: 12, // [LETRA MAS CHICA] (Antes 14)
         fontWeight: 'bold',
-        color: '#1890ff',
-        marginBottom: 15,
+        color: '#0984e3',
+        marginBottom: 20,
+        textAlign: 'center',
+        letterSpacing: 1,
     },
     infoRow: {
         flexDirection: 'row',
-        marginBottom: 8,
+        marginBottom: 10, // Un poco más de espacio entre filas
+        alignItems: 'center',
     },
     infoLabel: {
         fontWeight: '600',
-        width: 100,
-        color: '#555',
+        width: 90,
+        fontSize: 13, // [LETRA MAS CHICA]
+        color: '#636e72',
     },
     infoText: {
-        color: '#333',
+        color: '#2d3436',
         flex: 1,
+        fontSize: 13, // [LETRA MAS CHICA]
     },
     description: {
-        marginTop: 15,
-        color: '#666',
-        lineHeight: 20,
-        fontStyle: 'italic',
+        marginTop: 20,
+        color: '#636e72',
+        lineHeight: 22, // Mejor interlineado para lectura
+        fontSize: 13, // [LETRA MAS CHICA]
+        textAlign: 'justify',
     },
     sectionBlock: {
-        marginBottom: 25,
+        width: width * 0.9, // [ANCHO CONTROLADO] Alineado con el header
+        marginBottom: 30,
     },
     sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 15,
         paddingHorizontal: 5
     },
     sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
+        fontSize: 18, // [LETRA MAS CHICA] (Antes 20)
+        fontWeight: '700',
+        color: '#2d3436',
     },
     addButton: {
-        color: '#1890ff',
-        fontWeight: 'bold',
-        fontSize: 16,
+        color: '#0984e3',
+        fontWeight: '600',
+        fontSize: 14, // [LETRA MAS CHICA]
     },
     cardItem: {
         backgroundColor: 'white',
-        borderRadius: 8,
-        padding: 15,
-        marginBottom: 10,
+        borderRadius: 12,
+        padding: 20, // [PADDING AUMENTADO] (Antes 15)
+        marginBottom: 15,
         borderLeftWidth: 4,
         borderLeftColor: 'lightblue',
-        elevation: 1,
+        // Sombras más suaves
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+        elevation: 2,
     },
     cardTitle: {
-        fontSize: 16,
+        fontSize: 15, // [LETRA MAS CHICA] (Antes 16)
         fontWeight: 'bold',
-        color: '#333',
+        color: '#2d3436',
+        marginBottom: 4,
     },
     cardSubtitle: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 2,
+        fontSize: 13, // [LETRA MAS CHICA]
+        color: '#636e72',
+        marginBottom: 4,
     },
     cardDetail: {
-        fontSize: 12,
-        color: '#999',
+        fontSize: 12, // [LETRA MAS CHICA]
+        color: '#b2bec3',
+        fontStyle: 'italic',
         marginTop: 5,
     },
     badge: {
-        marginTop: 8,
+        marginTop: 10,
         alignSelf: 'flex-start',
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 12,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 20,
     },
     badgeGreen: {
-        backgroundColor: '#e6fffa',
-        borderWidth: 1,
-        borderColor: '#38b2ac',
+        backgroundColor: '#e3f9e5', // Un verde más pastel
+        borderWidth: 0, // Quitamos borde para estilo más limpio
     },
     badgeGray: {
-        backgroundColor: '#edf2f7',
-        borderWidth: 1,
-        borderColor: '#cbd5e0',
+        backgroundColor: '#f1f2f6',
+        borderWidth: 0,
     },
     badgeText: {
         fontSize: 10,
-        fontWeight: 'bold',
-        color: '#333',
+        fontWeight: '700',
+        color: '#2d3436',
+        textTransform: 'uppercase',
     },
     emptyText: {
         textAlign: 'center',
-        color: '#999',
+        color: '#b2bec3',
         fontStyle: 'italic',
-        marginTop: 10,
+        marginTop: 15,
+        fontSize: 13,
     }
 });
 

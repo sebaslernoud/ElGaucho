@@ -54,7 +54,7 @@ const AcceptInvitations = () => {
             <View style={styles.card}>
                 <View style={styles.infoContainer}>
                     <Text style={styles.userName}>{item.user.name} {item.user.lastName}</Text>
-                    <Text style={styles.userEmail}>{item.user.email}</Text>
+                    <Text style={styles.userEmail}>{item.roleInCourse}</Text>
                     <Text style={styles.courseName}>Curso: {item.course.title}</Text>
                 </View>
                 
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333',
     },
-    userEmail: {
+    userRole: {
         fontSize: 14,
         color: '#666',
         marginBottom: 5,
