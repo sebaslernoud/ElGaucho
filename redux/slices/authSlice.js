@@ -2,11 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Define la URL base de tu backend
-// IMPORTANTE: Usa la IP de tu máquina si estás en un emulador/dispositivo real
-// Si estás en un emulador de Android, '10.0.2.2' es tu localhost
-// Si estás en un emulador de iOS, 'localhost' o '127.0.0.1' funciona
-// Si estás en un dispositivo físico, necesitas la IP de tu máquina en la misma red
 const API_BASE_URL = 'http://192.168.0.30:3000/api'; // <--- ¡CAMBIA ESTO!
 
 // Thunk para el login asíncrono
