@@ -118,13 +118,6 @@ export const createUserCourse = async (req: Request, res: Response) => {
 */
 export const getUserCoursesByUserId = async (req: Request, res: Response) => {
  const { userId } = req.params;
- const authenticatedUserId = req.user?.userId;
- const authenticatedUserRole = req.user?.role;
-
- // Security check: A user can only fetch their own courses unless they are an admin.
- if (userId !== authenticatedUserId && authenticatedUserRole !== 'admin') {
-   return res.status(403).json({ message: 'Forbidden: You can only view your own courses unless you are an admin.' });
- }
 
  try {
    const userCourses = await prisma.userCourse.findMany({

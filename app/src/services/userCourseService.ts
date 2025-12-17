@@ -65,3 +65,19 @@ export const getUserCoursesByStatus = async (status: string, token: string) => {
     throw error;
   }
 };
+
+export const getUserCoursesByUserId = async (userId: string, token: string) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/user-courses/user/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error: any) {
+    // Si el usuario no tiene cursos (404), devolvemos array vacío para evitar errores en el front
+    if (error.response && error.response.status === 404) {
+        return [];
+    }
+    console.error(`Error fetching courses for user ${userId}:`, error);
+    throw error;
+  }
+};

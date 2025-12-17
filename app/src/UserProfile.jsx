@@ -12,29 +12,39 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { getUserProfileById } from './services/userService'; // Importamos el servicio nuevo
+import { getUserProfileById } from './services/userService'; 
+// [NUEVO] Importamos el servicio para obtener los cursos
+import { getUserCoursesByUserId } from './services/userCourseService'; 
 
 const UserProfile = () => {
-  const { userId } = useLocalSearchParams(); // Obtenemos el ID del participante
+  const { userId } = useLocalSearchParams(); 
   const router = useRouter();
   const token = useSelector(state => state.auth.token);
 
   const [user, setUser] = useState(null);
+  // [NUEVO] Estado para los cursos
+  const [courses, setCourses] = useState([]); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
         if (!userId || !token) return;
         try {
-            const data = await getUserProfileById(userId, token);
-            setUser(data);
+            // [MODIFICADO] Hacemos ambas peticiones en paralelo
+            const [userData, coursesData] = await Promise.all([
+                getUserProfileById(userId, token),
+                getUserCoursesByUserId(userId, token).catch(() => []) // Si falla (ej: 404 sin cursos), devolvemos array vacío
+            ]);
+
+            setUser(userData);
+            setCourses(coursesData);
         } catch (error) {
-            console.error(error);
+            console.error("Error cargando perfil:", error);
         } finally {
             setLoading(false);
         }
     };
-    fetchUser();
+    fetchData();
   }, [userId, token]);
 
   if (loading) {
@@ -56,6 +66,25 @@ const UserProfile = () => {
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
     return new Date(dateString).toLocaleDateString();
+  };
+
+  // Helper para el color del status
+  const getStatusColor = (status) => {
+      switch(status) {
+          case 'accepted': return '#E8F5E9'; // Verde claro
+          case 'pending': return '#FFF3E0';  // Naranja claro
+          case 'rejected': return '#FFEBEE'; // Rojo claro
+          default: return '#f5f5f5';
+      }
+  };
+  
+  const getStatusTextColor = (status) => {
+      switch(status) {
+          case 'accepted': return '#2E7D32'; 
+          case 'pending': return '#EF6C00';  
+          case 'rejected': return '#C62828'; 
+          default: return '#666';
+      }
   };
 
   return (
@@ -87,7 +116,7 @@ const UserProfile = () => {
                 </View>
             </View>
 
-            {/* Tarjeta de Información */}
+            {/* Tarjeta de Información Personal */}
             <View style={styles.infoCard}>
                 <Text style={styles.cardTitle}>Información Personal</Text>
                 
@@ -131,6 +160,30 @@ const UserProfile = () => {
                     </View>
                 </View>
             </View>
+
+            {/* [NUEVO] Tarjeta de Historial de Cursos */}
+            <View style={[styles.infoCard, { marginTop: 20 }]}>
+                <Text style={styles.cardTitle}>Historial de Cursos ({courses.length})</Text>
+                
+                {courses.length > 0 ? (
+                    courses.map((item, index) => (
+                        <View key={item.courseId + index}>
+                            <View style={styles.courseItem}>
+                                <View style={{flex: 1}}>
+                                    <Text style={styles.courseTitle}>{item.course?.title || 'Curso sin nombre'}</Text>
+                                    <Text style={styles.courseRole}>Rol: {item.roleInCourse}</Text>
+                                
+                                </View>
+                            </View>
+                            {/* Separador entre items, excepto el último */}
+                            {index < courses.length - 1 && <View style={styles.divider} />}
+                        </View>
+                    ))
+                ) : (
+                    <Text style={styles.emptyText}>Este usuario no ha participado en cursos.</Text>
+                )}
+            </View>
+
         </View>
       </ScrollView>
     </View>
@@ -162,7 +215,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     marginHorizontal: 20,
-    marginTop: 40, // Espacio para el botón de volver
+    marginTop: 40, 
   },
   profileHeader: {
     flexDirection: 'row',
@@ -212,7 +265,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#009AFF',
   },
-  // Info Card
   infoCard: {
     backgroundColor: '#fff',
     borderRadius: 20,
@@ -254,8 +306,40 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#f0f0f0',
     marginVertical: 10,
-    marginLeft: 50,
+    marginLeft: 10, // Ajustado
   },
+  // [NUEVOS ESTILOS PARA CURSOS]
+  courseItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 5,
+  },
+  courseTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#333',
+  },
+  courseRole: {
+      fontSize: 13,
+      color: '#666',
+      textTransform: 'capitalize',
+  },
+  statusBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 8,
+  },
+  statusText: {
+      fontSize: 10,
+      fontWeight: 'bold',
+  },
+  emptyText: {
+      fontStyle: 'italic',
+      color: '#999',
+      textAlign: 'center',
+      marginTop: 10,
+  }
 });
 
 export default UserProfile;
