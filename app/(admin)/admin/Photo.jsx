@@ -17,12 +17,11 @@ import * as ImagePicker from 'expo-image-picker';
 import { useSelector } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// [CORREGIDO] Ruta de importación solicitada
-import { getAllUsers } from '../../src/services/userService'; 
+// [CORREGIDO] Imports unificados del servicio
+import { getAllUsers, uploadUserPhoto } from '../../src/services/userService';
 
 const { width, height } = Dimensions.get('window');
 
-// [CORREGIDO] Nombre del componente cambiado a Photo
 const Photo = () => {
   const router = useRouter();
   const token = useSelector(state => state.auth.token);
@@ -58,7 +57,7 @@ const Photo = () => {
     fetchUsers();
   }, [token]);
 
-  // Filtro de búsqueda
+  // Filtro de búsqueda (Por Nombre o Email)
   const handleSearch = (text) => {
     setSearchText(text);
     setSelectedUserId(null); // Reseteamos selección al escribir
@@ -67,8 +66,12 @@ const Photo = () => {
     if (text) {
       const newData = users.filter(item => {
         const fullName = `${item.name} ${item.lastName}`.toUpperCase();
+        // Aseguramos que el email exista antes de convertirlo a mayúsculas
+        const email = item.email ? item.email.toUpperCase() : ''; 
         const textData = text.toUpperCase();
-        return fullName.indexOf(textData) > -1;
+        
+        // Buscamos coincidencia en el nombre O en el email
+        return fullName.indexOf(textData) > -1 || email.indexOf(textData) > -1;
       });
       setFilteredUsers(newData);
     } else {
@@ -78,7 +81,8 @@ const Photo = () => {
 
   const handleSelectUser = (item) => {
     setSelectedUserId(item.id);
-    setSearchText(`${item.name} ${item.lastName}`); // Solo mostramos nombre y apellido
+    // En el input mostramos solo el nombre para mantenerlo limpio
+    setSearchText(`${item.name} ${item.lastName}`); 
     setShowDropdown(false);
     Keyboard.dismiss();
   };
@@ -101,28 +105,24 @@ const Photo = () => {
     }
   };
 
-  // 3. Función para subir la imagen (Simulada para Service)
+  // 3. Función para subir la imagen
   const uploadImage = async () => {
     if (!selectedUserId) {
-      Alert.alert("Atención", "Por favor busque y seleccione un usuario.");
-      return;
-    }
-    if (!image) {
-      Alert.alert("Atención", "Por favor tome una foto primero.");
-      return;
+        Alert.alert("Error", "Seleccione un usuario primero");
+        return;
     }
 
     setUploading(true);
     try {
-      // TODO: Llamar al servicio de subida aquí
-      console.log("Subiendo foto para usuario ID:", selectedUserId);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulación
+      // Llamada real al backend
+      await uploadUserPhoto(selectedUserId, image, token);
 
       Alert.alert("Éxito", "Foto subida correctamente.");
       setImage(null);
       setSearchText('');
       setSelectedUserId(null);
     } catch (error) {
+      console.error(error);
       Alert.alert("Error", "Hubo un problema al subir la imagen.");
     } finally {
       setUploading(false);
@@ -145,7 +145,7 @@ const Photo = () => {
           <View style={styles.searchWrapper}>
             <TextInput
               style={styles.searchInput}
-              placeholder="Escriba el nombre..."
+              placeholder="Escriba nombre o email..."
               value={searchText}
               onChangeText={handleSearch}
               onFocus={() => setShowDropdown(true)}
@@ -172,7 +172,11 @@ const Photo = () => {
                       style={styles.dropdownItem} 
                       onPress={() => handleSelectUser(item)}
                     >
-                      <Text style={styles.itemText}>{item.name} {item.lastName}</Text>
+                      {/* Aquí mostramos Nombre y Email */}
+                      <View>
+                          <Text style={styles.itemText}>{item.name} {item.lastName}</Text>
+                          <Text style={styles.itemEmail}>{item.email}</Text>
+                      </View>
                     </TouchableOpacity>
                   )}
                   ListEmptyComponent={
@@ -226,7 +230,7 @@ const styles = StyleSheet.create({
   },
   bigBlock: {
     width: 0.9 * width,
-    minHeight: 0.65 * height, // Un poco más alto para acomodar la lista
+    minHeight: 0.65 * height,
     backgroundColor: "white",
     alignSelf: 'center',
     borderRadius: 15,
@@ -237,7 +241,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
-    zIndex: 1, // Para que la lista flote correctamente en algunos casos
+    zIndex: 1,
   },
   title: {
     fontSize: 22,
@@ -248,7 +252,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     width: '100%',
     marginBottom: 20,
-    zIndex: 10, // Importante para que el dropdown quede por encima de otros elementos
+    zIndex: 10,
   },
   label: {
     fontSize: 16,
@@ -273,7 +277,7 @@ const styles = StyleSheet.create({
   },
   dropdownList: {
     position: 'absolute',
-    top: 80, // Altura del label + input
+    top: 80,
     left: 0,
     right: 0,
     backgroundColor: 'white',
@@ -286,16 +290,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
-    zIndex: 100, // Máxima prioridad visual
+    zIndex: 100,
   },
   dropdownItem: {
-    padding: 15,
+    padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    justifyContent: 'center',
   },
   itemText: {
     fontSize: 16,
     color: '#333',
+    fontWeight: '500',
+  },
+  // Estilo para el email (gris y más chico)
+  itemEmail: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 2,
   },
   emptyText: {
     padding: 15,

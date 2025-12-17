@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma'; // Importa la instancia de PrismaClient
 
-// Extender la interfaz Request para que TypeScript reconozca req.user
-// Esto es necesario porque el middleware de autenticación añade 'user' a la Request
+import fs from 'fs';
+import path from 'path';
+
+const UPLOAD_DIR_BASE = 'C:/Users/54232/Desktop/appsMov/ElGaucho/assets/userPhotos';
+
 declare global {
   namespace Express {
     interface Request {
@@ -106,5 +109,55 @@ export const getAllUsers = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('Error fetching all users:', error);
     res.status(500).json({ message: 'Error fetching users', error: error.message });
+  }
+};
+
+export const uploadProfilePicture = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ message: 'No file uploaded.' });
+  }
+  
+  // Obtenemos el nombre del archivo (Ej: 'profilePicture-176...jpeg')
+  const fileNameToSave = file.filename; 
+
+  try {
+    // 1. Borrar foto anterior (Lógica adaptada para esperar SOLO el nombre del archivo en la BD)
+    const currentUser = await prisma.user.findUnique({ where: { id: userId }, select: { profilePictureUrl: true } });
+    
+    const oldFileName = currentUser?.profilePictureUrl;
+
+    if (oldFileName) {
+        // [MODIFICADO] oldFileName es el nombre directo de la BDD
+        const oldFilePath = path.join(UPLOAD_DIR_BASE, oldFileName);
+        
+        // Verificamos y borramos usando la ruta absoluta del escritorio
+        if (fs.existsSync(oldFilePath)) {
+            fs.unlinkSync(oldFilePath);
+        }
+    }
+
+    // 2. Actualizar BD
+    // [CLAVE] Guardamos SOLO el nombre del archivo en profilePictureUrl
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { profilePictureUrl: fileNameToSave },
+    });
+
+    // Respuesta al cliente (le decimos el nombre que guardamos)
+    res.status(200).json({ 
+        message: 'Profile picture updated successfully', 
+        profilePictureFileName: updatedUser.profilePictureUrl // Devolvemos el nombre
+    });
+
+  } catch (error: any) {
+    console.error('Error uploading profile picture:', error);
+    // Si falla, intentamos borrar el archivo recién subido
+    if (file && file.path) {
+      try { fs.unlinkSync(file.path); } catch(e) {} 
+    }
+    res.status(500).json({ message: 'Error uploading image', error: error.message });
   }
 };

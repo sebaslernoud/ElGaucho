@@ -238,11 +238,11 @@ const styles = StyleSheet.create({
   },
   titleContainer:{
     alignItems:'center',
-    marginTop: 10,
+    marginTop: 30,
     marginBottom: 10
   },
   title:{
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#333'
   },
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   label:{
-    fontSize: 16,
+    fontSize: 12,
     marginBottom: 5,
     fontWeight: '600',
     color: '#555',
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     paddingHorizontal: 10,
     height: 50,
-    fontSize: 16
+    fontSize: 14
   },
   textArea: {
     height: 80,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dateText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#333',
   },
   // Estilos para la vista previa del título
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   previewText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#004080',
     marginTop: 2,
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 5,
     marginBottom: 30,
     elevation: 3,
   },
