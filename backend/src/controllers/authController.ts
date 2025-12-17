@@ -54,7 +54,7 @@ export const login = async (req: Request, res: Response) => {
       { expiresIn: '1h' } // Token expira en 1 hora
     );
 
-    res.status(200).json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role,lastName: user.lastName,countryOfBirth: user.countryOfBirth,cityOfResidence:user.cityOfResidence,career: user.career,university: user.university,dateOfBirth: user.dateOfBirth } });
+    res.status(200).json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role,lastName: user.lastName,countryOfBirth: user.countryOfBirth,cityOfResidence:user.cityOfResidence,career: user.career,university: user.university,dateOfBirth: user.dateOfBirth,profilePictureUrl: user.profilePictureUrl } });
   } catch (error: any) {
     res.status(500).json({ message: 'Error logging in', error: error.message });
   }

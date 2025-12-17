@@ -2,6 +2,23 @@ import axios from 'axios';
 
 // Asegúrate de que coincida con tu IP
 const API_BASE_URL = 'http://192.168.0.30:3000/api'; 
+const API_UPLOADS_URL = 'http://192.168.0.30:3000/uploads';
+
+
+
+export const getUserImageUrl = (relativePath: string) => {
+  console.log('getUserImageUrl called with:', relativePath);
+  if (!relativePath) return null;
+
+  // Si ya es una URL completa (ej: Google Auth), la devolvemos tal cual
+  if (relativePath.startsWith('http')) {
+    return relativePath;
+  }
+
+  // Si es relativa, le pegamos el host del servidor
+  return `${API_UPLOADS_URL}/${relativePath}`;
+};
+
 
 export const getUserProfileById = async (userId: string, token: string) => {
   try {

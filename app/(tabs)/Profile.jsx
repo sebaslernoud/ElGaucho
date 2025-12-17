@@ -15,6 +15,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { logout } from '../../redux/slices/authSlice';
 import { getUserCoursesByStatus } from '../src/services/userCourseService';
 
+// IMPORTAMOS LA NUEVA FUNCIÓN DEL SERVICIO
+import { getUserImageUrl } from '../src/services/userService';
+
 const { width } = Dimensions.get('window');
 
 const Profile = () => {
@@ -90,16 +93,19 @@ const Profile = () => {
     </TouchableOpacity>
   );
 
+  // URL por defecto para evitar errores si getUserImageUrl retorna null
+  const defaultAvatar = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+
   return (
     <View style={styles.container}>
-      {/* Header Fijo */}
       <View style={styles.headerContainer}>
         <View style={styles.profileHeader}>
             <View style={styles.avatarContainer}>
+    
                 <Image
                     style={styles.avatar}
                     source={{
-                    uri: user?.profilePictureUrl || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+                        uri: getUserImageUrl(user?.profilePictureUrl) || defaultAvatar,
                     }}
                 />
             </View>
@@ -120,10 +126,9 @@ const Profile = () => {
             </TouchableOpacity>
         </View>
 
-        {/* Tarjeta de Información */}
+        {/* ... Resto de la UI (Información personal, etc.) sin cambios ... */}
         <View style={styles.infoCard}>
-            <Text style={styles.cardTitle}>Información Personal</Text>
-            
+           {/* ... contenido del card ... */}
             <View style={styles.infoRow}>
                 <MaterialCommunityIcons name="earth" size={20} color="#009AFF" style={styles.icon} />
                 <View>
@@ -133,9 +138,8 @@ const Profile = () => {
                     </Text>
                 </View>
             </View>
-
-            <View style={styles.divider} />
-
+             {/* ... etc ... */}
+             <View style={styles.divider} />
             <View style={styles.infoRow}>
                 <MaterialCommunityIcons name="school" size={20} color="#009AFF" style={styles.icon} />
                 <View>
@@ -143,10 +147,7 @@ const Profile = () => {
                     <Text style={styles.value}>{user?.university || 'No especificada'}</Text>
                 </View>
             </View>
-
             <View style={styles.divider} />
-
-            {/* --- SECCIÓN NUEVA: CARRERA --- */}
             <View style={styles.infoRow}>
                 <MaterialCommunityIcons name="book-open-variant" size={20} color="#009AFF" style={styles.icon} />
                 <View>
@@ -154,10 +155,7 @@ const Profile = () => {
                     <Text style={styles.value}>{user?.career || 'No especificada'}</Text>
                 </View>
             </View>
-
             <View style={styles.divider} />
-            {/* ------------------------------- */}
-
             <View style={styles.infoRow}>
                 <MaterialCommunityIcons name="cake-variant" size={20} color="#009AFF" style={styles.icon} />
                 <View>
@@ -168,10 +166,9 @@ const Profile = () => {
         </View>
       </View>
 
-      {/* Sección Historial de Cursos */}
       <View style={styles.coursesSection}>
+        {/* ... Resto de la sección de cursos ... */}
         <Text style={styles.sectionHeader}>Historial de Cursos</Text>
-        
         {loadingHistory ? (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator color="#009AFF" />
@@ -193,202 +190,203 @@ const Profile = () => {
   );
 };
 
+// ... Tus estilos StyleSheet.create quedan igual ...
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f7fa',
-  },
-  center: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    color: '#666',
-  },
-  message: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 10,
-  },
-  // Header
-  headerContainer: {
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: 'white',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 5,
-    zIndex: 1,
-  },
-  profileHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  avatarContainer: {
-    position: 'relative',
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 3,
-    borderColor: '#e6f7ff',
-  },
-  editIcon: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#009AFF',
-    borderRadius: 12,
-    padding: 6,
-    borderWidth: 2,
-    borderColor: 'white',
-  },
-  headerText: {
-    flex: 1,
-    marginLeft: 15,
-  },
-  name: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  email: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 5,
-  },
-  roleBadge: {
-    backgroundColor: '#e6f7ff',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  roleText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#009AFF',
-  },
-  logoutBtn: {
-    padding: 10,
-    backgroundColor: '#fff0f0',
-    borderRadius: 12,
-  },
-  // Info Card
-  infoCard: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-    padding: 15,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 5,
-  },
-  icon: {
-    marginRight: 15,
-    backgroundColor: '#f0f9ff',
-    padding: 8,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  label: {
-    fontSize: 12,
-    color: '#999',
-  },
-  value: {
-    fontSize: 15,
-    color: '#333',
-    fontWeight: '500',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#f0f0f0',
-    marginVertical: 8,
-    marginLeft: 50,
-  },
-  // Courses Section
-  coursesSection: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  sectionHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-    marginLeft: 5,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
-  // Estilos para tarjeta de curso
-  courseCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  courseIconContainer: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    backgroundColor: '#e6f7ff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  courseInfo: {
-    flex: 1,
-  },
-  courseTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  courseDetails: {
-    fontSize: 12,
-    color: '#888',
-  },
-  statusBadge: {
-    marginLeft: 10,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: '#999',
-    marginTop: 20,
-    fontStyle: 'italic',
-  }
+    container: {
+        flex: 1,
+        backgroundColor: '#f5f7fa',
+    },
+    center: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        color: '#666',
+    },
+    message: {
+        fontSize: 16,
+        color: '#666',
+        marginTop: 10,
+    },
+    // Header
+    headerContainer: {
+        paddingTop: 50,
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        backgroundColor: 'white',
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 5,
+        zIndex: 1,
+    },
+    profileHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    avatarContainer: {
+        position: 'relative',
+    },
+    avatar: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        borderWidth: 3,
+        borderColor: '#e6f7ff',
+    },
+    editIcon: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#009AFF',
+        borderRadius: 12,
+        padding: 6,
+        borderWidth: 2,
+        borderColor: 'white',
+    },
+    headerText: {
+        flex: 1,
+        marginLeft: 15,
+    },
+    name: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    email: {
+        fontSize: 14,
+        color: '#888',
+        marginBottom: 5,
+    },
+    roleBadge: {
+        backgroundColor: '#e6f7ff',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 10,
+        paddingVertical: 3,
+        borderRadius: 10,
+    },
+    roleText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: '#009AFF',
+    },
+    logoutBtn: {
+        padding: 10,
+        backgroundColor: '#fff0f0',
+        borderRadius: 12,
+    },
+    // Info Card
+    infoCard: {
+        backgroundColor: '#fff',
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#f0f0f0',
+        padding: 15,
+    },
+    cardTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 15,
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 5,
+    },
+    icon: {
+        marginRight: 15,
+        backgroundColor: '#f0f9ff',
+        padding: 8,
+        borderRadius: 10,
+        overflow: 'hidden',
+    },
+    label: {
+        fontSize: 12,
+        color: '#999',
+    },
+    value: {
+        fontSize: 15,
+        color: '#333',
+        fontWeight: '500',
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#f0f0f0',
+        marginVertical: 8,
+        marginLeft: 50,
+    },
+    // Courses Section
+    coursesSection: {
+        flex: 1,
+        paddingHorizontal: 20,
+        paddingTop: 20,
+    },
+    sectionHeader: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 15,
+        marginLeft: 5,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    listContent: {
+        paddingBottom: 20,
+    },
+    // Estilos para tarjeta de curso
+    courseCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        padding: 15,
+        borderRadius: 12,
+        marginBottom: 12,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+        elevation: 2,
+    },
+    courseIconContainer: {
+        width: 45,
+        height: 45,
+        borderRadius: 22.5,
+        backgroundColor: '#e6f7ff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    courseInfo: {
+        flex: 1,
+    },
+    courseTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
+        marginBottom: 4,
+    },
+    courseDetails: {
+        fontSize: 12,
+        color: '#888',
+    },
+    statusBadge: {
+        marginLeft: 10,
+    },
+    emptyText: {
+        textAlign: 'center',
+        color: '#999',
+        marginTop: 20,
+        fontStyle: 'italic',
+    }
 });
 
 export default Profile;

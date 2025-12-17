@@ -13,7 +13,6 @@ router.get('/:id', authenticateToken, getUserById);
 // Requiere autenticación y rol de 'admin'
 router.get('/admin-data', authenticateToken, authorizeRoles(['admin']), getAdminData);
 router.get('/', authenticateToken, authorizeRoles(['admin']), getAllUsers);
-
 router.post(
     '/:userId/profile-picture', 
     authenticateToken, 

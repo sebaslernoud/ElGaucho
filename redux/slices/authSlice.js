@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://192.168.0.30:3000/api'; // <--- ¡CAMBIA ESTO!
+const API_BASE_URL = 'http://192.168.0.30:3000/api'; 
 
 // Thunk para el login asíncrono
 export const loginUser = createAsyncThunk(
