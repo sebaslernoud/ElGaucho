@@ -86,3 +86,25 @@ export const getUserById = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching user', error: error.message });
   }
 };
+
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      // Seleccionamos solo lo necesario para el selector/lista
+      select: {
+        id: true,
+        name: true,
+        lastName: true,
+        email: true,
+      },
+      orderBy: {
+        name: 'asc', // Opcional: ordenarlos alfabéticamente
+      },
+    });
+    res.status(200).json(users);
+  } catch (error: any) {
+    console.error('Error fetching all users:', error);
+    res.status(500).json({ message: 'Error fetching users', error: error.message });
+  }
+};

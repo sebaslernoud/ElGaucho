@@ -22,13 +22,13 @@ export default function AdminLayout() {
         }}
       />
       <Tabs.Screen
-        name="AdminNotifications"
+        name="Photo"
         options={{
-          title: 'Notificaciones',
-          tabBarLabel: 'Notificaciones',
-          headerTitle: 'Notificaciones',
+          title: 'Fotos',
+          tabBarLabel: 'Photo',
+          headerTitle: 'Photo',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="bell" color={color} size={size} />
+            <MaterialCommunityIcons name="camera" color={color} size={size} />
           ),
         }}
       />

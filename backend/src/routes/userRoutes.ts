@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken, authorizeRoles } from '../middlewares/authMiddleware';
-import { getUserProfile, getAdminData, getUserById } from '../controllers/userController'; // <-- Importa las funciones del controlador
+import { getUserProfile, getAdminData, getUserById, getAllUsers } from '../controllers/userController'; // <-- Importa las funciones del controlador
 
 const router = Router();
 
@@ -12,5 +12,6 @@ router.get('/:id', authenticateToken, getUserById);
 // GET /api/users/admin-data - Obtener datos sensibles de administrador
 // Requiere autenticación y rol de 'admin'
 router.get('/admin-data', authenticateToken, authorizeRoles(['admin']), getAdminData);
+router.get('/', authenticateToken, authorizeRoles(['admin']), getAllUsers);
 
 export default router;
