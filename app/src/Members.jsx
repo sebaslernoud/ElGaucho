@@ -12,6 +12,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getCourseById } from './services/courseService'; 
+// Importamos la función para obtener la URL de la imagen
+import { getUserImageUrl } from './services/userService'; 
 
 const Members = () => {
     const { courseId } = useLocalSearchParams();
@@ -28,7 +30,7 @@ const Members = () => {
                 // Obtenemos los participantes del curso
                 const courseData = await getCourseById(courseId, token);
                 
-                // --- CAMBIO PRINCIPAL: Filtrar solo miembros con status 'accepted' ---
+                // Filtrar solo miembros con status 'accepted'
                 const acceptedMembers = (courseData.userCourses || []).filter(m => m.status === 'accepted');
                 setMembers(acceptedMembers);
                 
@@ -63,26 +65,32 @@ const Members = () => {
             <View style={styles.sectionContainer}>
                 <Text style={styles.roleTitle}>{title}</Text>
                 <View style={styles.gridContainer}>
-                    {roleMembers.map((item) => (
-                        <TouchableOpacity 
-                            key={item.userId}
-                            style={styles.memberCard}
-                            onPress={() => router.push({ 
-                                pathname: '/src/UserProfile', 
-                                params: { userId: item.userId } 
-                            })}
-                        >
-                            <Image 
-                                style={styles.avatar} 
-                                source={{ 
-                                    uri: item.user.profilePictureUrl || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" 
-                                }} 
-                            />
-                            <Text style={styles.memberName} numberOfLines={2}>
-                                {item.user.name} {item.user.lastName}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
+                    {roleMembers.map((item) => {
+                        // Obtenemos la URL de la foto usando el servicio
+                        const imageUrl = getUserImageUrl(item.user.profilePictureUrl);
+                        
+                        return (
+                            <TouchableOpacity 
+                                key={item.userId}
+                                style={styles.memberCard}
+                                onPress={() => router.push({ 
+                                    pathname: '/src/UserProfile', 
+                                    params: { userId: item.userId } 
+                                })}
+                            >
+                                <Image 
+                                    style={styles.avatar} 
+                                    source={{ 
+                                        // Usamos la URL procesada o el avatar por defecto
+                                        uri: imageUrl || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" 
+                                    }} 
+                                />
+                                <Text style={styles.memberName} numberOfLines={2}>
+                                    {item.user.name} {item.user.lastName}
+                                </Text>
+                            </TouchableOpacity>
+                        );
+                    })}
                 </View>
             </View>
         );

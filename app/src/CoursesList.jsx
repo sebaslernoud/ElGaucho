@@ -1,14 +1,13 @@
+import axios from 'axios';
+import { Link } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    StyleSheet,
+    Text,
+    TouchableOpacity
 } from 'react-native';
-import { Link } from 'expo-router';
-import axios from 'axios';
 
 const CoursesList = ({ userId, token }) => {
   const [courses, setCourses] = useState([]);

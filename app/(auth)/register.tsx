@@ -1,22 +1,22 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import axios from 'axios';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
   Alert,
+  Dimensions,
+  Image,
   KeyboardAvoidingView,
   Platform,
-  Image
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { router } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { validateRegisterData } from '../../validation/registerValidation';
-import axios from 'axios';
 
 const { width } = Dimensions.get('window');
 
