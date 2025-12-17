@@ -125,10 +125,6 @@ const Notifications = () => {
           <Text style={[styles.cardMessage, !isUnread && styles.readText]}>
             {item.message}
           </Text>
-          
-          <Text style={styles.dateText}>
-            {new Date(item.createdAt).toLocaleDateString()} - {new Date(item.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-          </Text>
         </View>
       </TouchableOpacity>
     );

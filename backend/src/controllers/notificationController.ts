@@ -45,15 +45,6 @@ export const createNotification = async (req: Request, res: Response): Promise<R
  if (!userId || !type || !title || !message) {
    return res.status(400).json({ message: 'Missing required fields: userId, type, title, and message are required.' });
  }
-
- // Opcional: Validar que el userId de la notificación a crear
- // coincida con el userId del token si solo un usuario puede crear
- // notificaciones para sí mismo. Si es un admin, esto no sería necesario.
- // const authenticatedUserId = (req as any).user?.id;
- // if (userId !== authenticatedUserId && !(req as any).user?.isAdmin) { // Asume que tienes un rol 'isAdmin'
- //   return res.status(403).json({ message: 'Forbidden: You can only create notifications for yourself or if you are an admin.' });
- // }
-
  try {
    // Verificar si el userId existe en la tabla User
    const userExists = await prisma.user.findUnique({ where: { id: userId } });
@@ -93,7 +84,8 @@ export const createNotification = async (req: Request, res: Response): Promise<R
 */
 export const markNotificationAsRead = async (req: Request, res: Response): Promise<Response> => {
  const { id } = req.params; // ID de la notificación a marcar como leída
- const userId = (req as any).user?.id;
+ const userId = (req as any).user?.userId;
+ console.log('Notification found:', id);
 
  if (!userId) {
    return res.status(401).json({ message: 'Unauthorized: User ID not found in token.' });
@@ -103,6 +95,7 @@ export const markNotificationAsRead = async (req: Request, res: Response): Promi
    const notification = await prisma.notification.findUnique({
      where: { id: id },
    });
+   
 
    if (!notification) {
      return res.status(404).json({ message: 'Notification not found.' });
@@ -131,7 +124,7 @@ export const markNotificationAsRead = async (req: Request, res: Response): Promi
 */
 export const deleteNotification = async (req: Request, res: Response): Promise<Response> => {
  const { id } = req.params;
- const userId = (req as any).user?.id;
+ const userId = (req as any).user?.userId;
  // const isAdmin = (req as any).user?.isAdmin; // Si tienes roles de administrador
 
  if (!userId) {

@@ -54,6 +54,17 @@ export default function AdminLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="AddSpeaker"
+        options={{
+          title: 'Crear Orador',
+          tabBarLabel: 'Crear Orador',
+          headerTitle: 'Crear Orador',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="microphone" color={color} size={size} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

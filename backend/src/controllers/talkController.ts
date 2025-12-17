@@ -40,6 +40,7 @@ export const createTalk = async (req: Request, res: Response) => {
   }
 
   try {
+    // 1. Crear la charla
     const newTalk = await prisma.talk.create({
       data: {
         courseId,
@@ -52,6 +53,50 @@ export const createTalk = async (req: Request, res: Response) => {
         speakerId,
       },
     });
+
+    // --- BLOQUE DE NOTIFICACIONES ---
+    try {
+      // 2. Obtener datos extra para el mensaje (Nombre del Orador)
+      const speaker = await prisma.speaker.findUnique({
+        where: { id: speakerId },
+        select: { speakerName: true }
+      });
+      const speakerName = speaker?.speakerName || 'Orador invitado';
+
+      // 3. Buscar a todos los usuarios inscritos en el curso
+      // Se puede filtrar por status: 'accepted' si solo quieres notificar a los aceptados
+      const enrolledUsers = await prisma.userCourse.findMany({
+        where: { courseId: courseId },
+        select: { userId: true }
+      });
+
+      if (enrolledUsers.length > 0) {
+        // Formatear la fecha para que sea legible en el mensaje
+        const dateObj = new Date(startTime);
+        const datePart = dateObj.toLocaleDateString(); // Ej: 12/10/2025
+        const timePart = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Ej: 14:30
+
+        const notificationsData = enrolledUsers.map((user) => ({
+          userId: user.userId,
+          type: 'NEW_TALK',
+          title: title, 
+          message: `Orador: ${speakerName}\nFecha: ${datePart}\nHora: ${timePart}\nSala: ${room}`,
+          relatedCourseId: courseId,
+          relatedTalkId: newTalk.id,
+          isRead: false
+        }));
+
+        await prisma.notification.createMany({
+          data: notificationsData
+        });
+      }
+
+    } catch (notifyError) {
+      // Si falla la notificación, no queremos que falle la creación de la charla, solo lo logueamos.
+      console.error('Error enviando notificaciones de nueva charla:', notifyError);
+    }
+    // --------------------------------
+
     res.status(201).json(newTalk);
   } catch (error: any) {
     res.status(500).json({ message: 'Error creating talk', error: error.message });

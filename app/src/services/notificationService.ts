@@ -27,14 +27,20 @@ export const getUserNotifications = async (token: string): Promise<Notification[
   }
 };
 
-// Marcar una notificación como leída
-export const markNotificationAsRead = async (id: string, token: string): Promise<void> => {
+export const markNotificationAsRead = async (notificationId: string, token: string) => {
   try {
-    await axios.put(`${API_BASE_URL}/notifications/${id}/read`, {}, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    // La ruta debe ser EXACTAMENTE: /notifications/:id/read
+    // El error 404 suele ser por olvidar '/api' o escribir mal esta parte
+    const response = await axios.patch(
+      `${API_BASE_URL}/notifications/${notificationId}/read`, 
+      {}, // Body vacío para PATCH
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
   } catch (error) {
-    console.error(`Error marking notification ${id} as read:`, error);
+    console.error('Error marking notification as read:', error);
     throw error;
   }
 };
